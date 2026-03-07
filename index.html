@@ -1,48 +1,686 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TJK Booking</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Бронирование ТЖК</title>
 
-<style>
+  <style>
+    :root{
+      --bg0:#050A14;
+      --bg1:#0B1330;
+      --glass:rgba(255,255,255,.08);
+      --glass2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.95);
+      --muted:rgba(255,255,255,.66);
+      --brand:#22c55e;
+      --brand2:#3b82f6;
+      --danger:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+      --radius:22px;
+    }
 
-body{
-margin:0;
-font-family:Arial;
-background:#0B1330;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-color:white;
-}
+    *{ box-sizing:border-box; }
 
-.card{
-background:#111a3a;
-padding:40px;
-border-radius:20px;
-width:90%;
-max-width:500px;
-text-align:center;
-box-shadow:0 20px 40px rgba(0,0,0,.5);
-}
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.16), transparent 32%),
+        radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 28%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    }
 
-h1{
-margin-top:0;
-}
+    body{
+      min-height:100vh;
+      padding:24px 16px;
+    }
 
-</style>
+    .wrap{
+      width:100%;
+      max-width:1040px;
+      margin:0 auto;
+    }
 
+    .hero{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+      font-size:clamp(28px,4vw,42px);
+      line-height:1.05;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      backdrop-filter:blur(12px);
+      overflow:hidden;
+    }
+
+    .panelInner{
+      padding:22px;
+    }
+
+    .sectionTitle{
+      margin:0 0 16px;
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:13px;
+      color:rgba(255,255,255,.9);
+      font-weight:600;
+    }
+
+    input, textarea, select, button{
+      font:inherit;
+    }
+
+    input, textarea, select{
+      width:100%;
+      border:none;
+      outline:none;
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:16px;
+      padding:14px 14px;
+      min-height:48px;
+    }
+
+    input::placeholder, textarea::placeholder{
+      color:rgba(255,255,255,.38);
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+
+    .btn{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:16px;
+      min-height:50px;
+      padding:0 18px;
+      color:#fff;
+      font-weight:700;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn:active{ transform:translateY(0); }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .btnPrimary{
+      background:linear-gradient(90deg, var(--brand2), var(--brand));
+      box-shadow:0 10px 24px rgba(34,197,94,.18);
+    }
+
+    .btnGhost{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.11);
+    }
+
+    .status{
+      margin-top:14px;
+      padding:13px 14px;
+      border-radius:16px;
+      font-size:14px;
+      line-height:1.45;
+      display:none;
+    }
+
+    .status.show{ display:block; }
+    .status.info{
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.25);
+    }
+    .status.success{
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.25);
+    }
+    .status.error{
+      background:rgba(239,68,68,.12);
+      border:1px solid rgba(239,68,68,.25);
+    }
+
+    .kitsList{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .kitCard{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:16px;
+      transition:border-color .15s ease, background .15s ease;
+    }
+
+    .kitCard.selected{
+      border-color:rgba(59,130,246,.7);
+      background:rgba(59,130,246,.12);
+    }
+
+    .kitTop{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+
+    .kitName{
+      font-weight:700;
+      font-size:16px;
+      line-height:1.3;
+    }
+
+    .kitDesc{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+      white-space:pre-wrap;
+    }
+
+    .radioWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:14px;
+      color:rgba(255,255,255,.92);
+      font-size:14px;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .metaCard{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .metaRow{
+      padding:14px 0;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .metaRow:last-child{ border-bottom:none; }
+
+    .metaLabel{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .metaValue{
+      font-size:15px;
+      line-height:1.45;
+    }
+
+    .apiBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:8px 12px;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.25);
+      font-size:13px;
+      color:#d8ffe8;
+    }
+
+    .empty{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      padding:10px 0 0;
+    }
+
+    .footerNote{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width: 900px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 640px){
+      body{
+        padding:14px 10px 22px;
+      }
+
+      .panelInner{
+        padding:16px;
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+
+      .hero{
+        margin-bottom:14px;
+      }
+
+      .hero h1{
+        font-size:34px;
+      }
+
+      .sectionTitle{
+        font-size:18px;
+      }
+
+      input, textarea, select{
+        min-height:52px;
+        padding:15px 14px;
+        font-size:16px;
+      }
+
+      .btn{
+        width:100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Бронирование ТЖК</h1>
+      <p>Фронтенд на Vercel + backend на Google Apps Script</p>
+    </div>
 
-<div class="card">
-<h1>Интерфейс бронирования ТЖК</h1>
-<p>Frontend успешно подключён</p>
-<p>Следующий шаг — подключить Apps Script API</p>
-</div>
+    <div class="layout">
+      <section class="panel">
+        <div class="panelInner">
+          <h2 class="sectionTitle">Оформление заявки</h2>
 
+          <div class="grid">
+            <div class="field">
+              <label for="fio">ФИО</label>
+              <input id="fio" type="text" placeholder="Иванов Иван Иванович" />
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="name@mail.ru" />
+            </div>
+
+            <div class="field">
+              <label for="phone">Телефон</label>
+              <input id="phone" type="text" placeholder="+7 900 000-00-00" />
+            </div>
+
+            <div class="field">
+              <label for="event">Мероприятие</label>
+              <input id="event" type="text" placeholder="Съёмка / интервью / трансляция" />
+            </div>
+
+            <div class="field">
+              <label for="start">Начало</label>
+              <input id="start" type="text" placeholder="10.03.2026 12:00" />
+            </div>
+
+            <div class="field">
+              <label for="end">Окончание</label>
+              <input id="end" type="text" placeholder="10.03.2026 14:00" />
+            </div>
+
+            <div class="field">
+              <label for="needBoom">Нужна ли удочка / микрофон</label>
+              <select id="needBoom">
+                <option value="">— Выберите —</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="comment">Комментарий</label>
+              <textarea id="comment" placeholder="Дополнительные условия, особенности съёмки, пожелания по комплекту..."></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btnPrimary" id="btnLoad">Показать свободные комплекты</button>
+            <button class="btn btnGhost" id="btnBook" disabled>Забронировать выбранный комплект</button>
+          </div>
+
+          <div class="status info show" id="statusBox">
+            Сначала укажите даты и время, затем нажмите «Показать свободные комплекты».
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panelInner">
+          <h2 class="sectionTitle">Свободные комплекты</h2>
+
+          <div class="metaCard">
+            <div class="metaRow">
+              <div class="metaLabel">Статус API</div>
+              <div class="metaValue">
+                <span class="apiBadge" id="apiBadge">Подключено</span>
+              </div>
+            </div>
+
+            <div class="metaRow">
+              <div class="metaLabel">Выбранный период</div>
+              <div class="metaValue" id="selectedPeriod">—</div>
+            </div>
+
+            <div class="metaRow">
+              <div class="metaLabel">Выбранный комплект</div>
+              <div class="metaValue" id="selectedKitName">—</div>
+            </div>
+          </div>
+
+          <div class="kitsList" id="kitsList"></div>
+          <div class="empty" id="emptyBox">Комплекты пока не загружены.</div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footerNote">
+      Рабочий API подключён к Google Sheets через Apps Script.
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxXUO9796H2XIHvNJOG1fKU9mcjo5QMncsYk9p_VgM4yVYLRFyU83gORJBUBD2xao06mQ/exec";
+
+    const fioEl = document.getElementById("fio");
+    const emailEl = document.getElementById("email");
+    const phoneEl = document.getElementById("phone");
+    const eventEl = document.getElementById("event");
+    const startEl = document.getElementById("start");
+    const endEl = document.getElementById("end");
+    const needBoomEl = document.getElementById("needBoom");
+    const commentEl = document.getElementById("comment");
+
+    const btnLoad = document.getElementById("btnLoad");
+    const btnBook = document.getElementById("btnBook");
+
+    const statusBox = document.getElementById("statusBox");
+    const kitsList = document.getElementById("kitsList");
+    const emptyBox = document.getElementById("emptyBox");
+    const selectedPeriod = document.getElementById("selectedPeriod");
+    const selectedKitName = document.getElementById("selectedKitName");
+
+    let selectedKit = "";
+    let lastLoadedKits = [];
+
+    function setStatus(type, text){
+      statusBox.className = "status show " + type;
+      statusBox.textContent = text;
+    }
+
+    function escapeHtml(str){
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function apiGetKits(start, end){
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "getKits");
+      url.searchParams.set("start", start);
+      url.searchParams.set("end", end);
+
+      const res = await fetch(url.toString(), {
+        method: "GET"
+      });
+
+      if (!res.ok) {
+        throw new Error("Ошибка сети при получении комплектов");
+      }
+
+      return await res.json();
+    }
+
+    async function apiCreateBooking(payload){
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "createBooking");
+      url.searchParams.set("fio", payload.fio);
+      url.searchParams.set("email", payload.email);
+      url.searchParams.set("phone", payload.phone);
+      url.searchParams.set("event", payload.event);
+      url.searchParams.set("start", payload.start);
+      url.searchParams.set("end", payload.end);
+      url.searchParams.set("kit", payload.kit);
+      url.searchParams.set("need_boom", payload.need_boom);
+      url.searchParams.set("comment", payload.comment);
+
+      const res = await fetch(url.toString(), {
+        method: "GET"
+      });
+
+      if (!res.ok) {
+        throw new Error("Ошибка сети при создании брони");
+      }
+
+      return await res.json();
+    }
+
+    function renderKits(kits){
+      kitsList.innerHTML = "";
+
+      if (!Array.isArray(kits) || !kits.length) {
+        emptyBox.style.display = "block";
+        emptyBox.textContent = "На выбранный период свободных комплектов нет.";
+        btnBook.disabled = true;
+        selectedKit = "";
+        selectedKitName.textContent = "—";
+        return;
+      }
+
+      emptyBox.style.display = "none";
+
+      kits.forEach((kitName) => {
+        const card = document.createElement("div");
+        card.className = "kitCard";
+        card.dataset.kit = kitName;
+
+        card.innerHTML = `
+          <div class="kitTop">
+            <div class="kitName">${escapeHtml(kitName)}</div>
+          </div>
+          <div class="radioWrap">
+            <input type="radio" name="kit" value="${escapeHtml(kitName)}" />
+            <span>Выбрать этот комплект</span>
+          </div>
+        `;
+
+        const radio = card.querySelector("input[type='radio']");
+        radio.addEventListener("change", () => {
+          selectedKit = kitName;
+          selectedKitName.textContent = kitName;
+
+          document.querySelectorAll(".kitCard").forEach(el => el.classList.remove("selected"));
+          card.classList.add("selected");
+
+          btnBook.disabled = false;
+        });
+
+        kitsList.appendChild(card);
+      });
+    }
+
+    btnLoad.addEventListener("click", async () => {
+      const start = startEl.value.trim();
+      const end = endEl.value.trim();
+
+      selectedPeriod.textContent = (start && end) ? `${start} — ${end}` : "—";
+      selectedKit = "";
+      selectedKitName.textContent = "—";
+      btnBook.disabled = true;
+
+      if (!start || !end) {
+        setStatus("error", "Заполните поля «Начало» и «Окончание».");
+        return;
+      }
+
+      try {
+        btnLoad.disabled = true;
+        setStatus("info", "Загружаем свободные комплекты...");
+
+        const result = await apiGetKits(start, end);
+
+        if (!result.ok) {
+          renderKits([]);
+          setStatus("error", result.message || "Не удалось получить свободные комплекты.");
+          return;
+        }
+
+        lastLoadedKits = result.kits || [];
+        renderKits(lastLoadedKits);
+
+        if (lastLoadedKits.length) {
+          setStatus("success", "Свободные комплекты найдены. Выберите нужный комплект.");
+        } else {
+          setStatus("info", "На выбранный период свободных комплектов нет.");
+        }
+
+      } catch (err) {
+        renderKits([]);
+        setStatus("error", err.message || "Ошибка при загрузке комплектов.");
+      } finally {
+        btnLoad.disabled = false;
+      }
+    });
+
+    btnBook.addEventListener("click", async () => {
+      const payload = {
+        fio: fioEl.value.trim(),
+        email: emailEl.value.trim(),
+        phone: phoneEl.value.trim(),
+        event: eventEl.value.trim(),
+        start: startEl.value.trim(),
+        end: endEl.value.trim(),
+        kit: selectedKit,
+        need_boom: needBoomEl.value.trim(),
+        comment: commentEl.value.trim()
+      };
+
+      if (!payload.fio || !payload.email || !payload.phone || !payload.event) {
+        setStatus("error", "Заполните ФИО, Email, Телефон и Мероприятие.");
+        return;
+      }
+
+      if (!payload.start || !payload.end) {
+        setStatus("error", "Укажите даты и время.");
+        return;
+      }
+
+      if (!payload.kit) {
+        setStatus("error", "Сначала выберите комплект.");
+        return;
+      }
+
+      try {
+        btnBook.disabled = true;
+        setStatus("info", "Создаём бронь...");
+
+        const result = await apiCreateBooking(payload);
+
+        if (result.status === "success") {
+          setStatus("success", "Заявка создана. Бронь отправлена на рассмотрение.");
+          return;
+        }
+
+        if (result.status === "occupied") {
+          setStatus("error", "Пока вы оформляли заявку, комплект уже заняли. Обновите список.");
+          return;
+        }
+
+        setStatus("error", result.message || "Не удалось создать бронь.");
+
+      } catch (err) {
+        setStatus("error", err.message || "Ошибка при создании брони.");
+      } finally {
+        btnBook.disabled = false;
+      }
+    });
+
+    (async function init(){
+      try {
+        const url = new URL(API_URL);
+        url.searchParams.set("action", "ping");
+
+        const res = await fetch(url.toString());
+        const data = await res.json();
+
+        if (!data.ok) throw new Error("Ping error");
+      } catch (e) {
+        document.getElementById("apiBadge").textContent = "Ошибка подключения";
+        document.getElementById("apiBadge").style.background = "rgba(239,68,68,.12)";
+        document.getElementById("apiBadge").style.borderColor = "rgba(239,68,68,.28)";
+        setStatus("error", "Не удалось подключиться к Apps Script API.");
+      }
+    })();
+  </script>
 </body>
 </html>
