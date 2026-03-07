@@ -25,8 +25,18 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    const text = await response.text();
+
+    try {
+      const data = JSON.parse(text);
+      return res.status(200).json(data);
+    } catch (parseErr) {
+      return res.status(500).json({
+        ok: false,
+        message: 'Apps Script returned non-JSON response',
+        raw: text
+      });
+    }
 
   } catch (err) {
     return res.status(500).json({
