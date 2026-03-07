@@ -13,17 +13,32 @@ export default async function handler(req, res) {
       });
     }
 
-    const response = await fetch(appsScriptUrl, {
+    const payload = JSON.stringify({
+      action: 'getKits',
+      start,
+      end
+    });
+
+    let response = await fetch(appsScriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
       },
-      body: JSON.stringify({
-        action: 'getKits',
-        start,
-        end
-      })
+      body: payload,
+      redirect: 'manual'
     });
+
+    const location = response.headers.get('location');
+
+    if (location) {
+      response = await fetch(location, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: payload
+      });
+    }
 
     const text = await response.text();
 
@@ -34,7 +49,8 @@ export default async function handler(req, res) {
       return res.status(500).json({
         ok: false,
         message: 'Apps Script returned non-JSON response',
-        raw: text
+        status: response.status,
+        raw: text.slice(0, 1500)
       });
     }
 
