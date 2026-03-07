@@ -13,39 +13,21 @@ export default async function handler(req, res) {
       });
     }
 
-    const payload = JSON.stringify({
-      action: 'getKits',
-      start,
-      end
+    const url = new URL(appsScriptUrl);
+    url.searchParams.set('action', 'getKits');
+    url.searchParams.set('start', start);
+    url.searchParams.set('end', end);
+
+    const response = await fetch(url.toString(), {
+      method: 'GET'
     });
-
-    let response = await fetch(appsScriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: payload,
-      redirect: 'manual'
-    });
-
-    const location = response.headers.get('location');
-
-    if (location) {
-      response = await fetch(location, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: payload
-      });
-    }
 
     const text = await response.text();
 
     try {
       const data = JSON.parse(text);
       return res.status(200).json(data);
-    } catch (parseErr) {
+    } catch (err) {
       return res.status(500).json({
         ok: false,
         message: 'Apps Script returned non-JSON response',
@@ -53,7 +35,6 @@ export default async function handler(req, res) {
         raw: text.slice(0, 1500)
       });
     }
-
   } catch (err) {
     return res.status(500).json({
       ok: false,
