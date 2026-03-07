@@ -1,0 +1,37 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ ok: false, message: 'Method not allowed' });
+  }
+
+  try {
+    const { start, end, appsScriptUrl } = req.body || {};
+
+    if (!start || !end || !appsScriptUrl) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Missing start, end or appsScriptUrl'
+      });
+    }
+
+    const response = await fetch(appsScriptUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action: 'getKits',
+        start,
+        end
+      })
+    });
+
+    const data = await response.json();
+    return res.status(200).json(data);
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      message: String(err)
+    });
+  }
+}
