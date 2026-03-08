@@ -99,6 +99,7 @@
       background:linear-gradient(180deg, var(--glass), var(--glass2));
       box-shadow:var(--shadow);
       backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
       overflow:hidden;
     }
 
@@ -145,7 +146,8 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease);
+      font:inherit;
     }
 
     .input:focus,
@@ -187,7 +189,8 @@
       font-weight:800;
       color:#fff;
       cursor:pointer;
-      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease);
+      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease), background .18s var(--ease);
+      font:inherit;
     }
 
     .btn:hover{ transform:translateY(-1px); }
@@ -217,6 +220,8 @@
       font-weight:700;
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
+      color:#fff;
+      cursor:pointer;
     }
 
     .status{
@@ -248,6 +253,8 @@
       flex-direction:column;
       gap:12px;
       margin-bottom:18px;
+      position:sticky;
+      top:12px;
     }
 
     .metaBox{
@@ -285,6 +292,12 @@
       font-weight:700;
     }
 
+    .apiBadge.error{
+      background:rgba(239,68,68,.12);
+      border-color:rgba(239,68,68,.28);
+      color:#ffd9d9;
+    }
+
     .kits{
       display:flex;
       flex-direction:column;
@@ -296,12 +309,18 @@
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
       padding:16px;
-      transition:border-color .18s var(--ease), background .18s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease);
+    }
+
+    .kit:hover{
+      border-color:rgba(255,255,255,.16);
+      background:rgba(255,255,255,.055);
     }
 
     .kit.selected{
       border-color:rgba(59,130,246,.72);
       background:rgba(59,130,246,.11);
+      box-shadow:0 0 0 1px rgba(59,130,246,.14) inset;
     }
 
     .kitHead{
@@ -337,6 +356,15 @@
       margin-top:14px;
       font-size:14px;
       color:rgba(255,255,255,.94);
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .kitPick input{
+      accent-color:#3b82f6;
+      width:18px;
+      height:18px;
+      flex:0 0 auto;
     }
 
     .kitActions{
@@ -364,6 +392,10 @@
     @media (max-width:980px){
       .layout{
         grid-template-columns:1fr;
+      }
+
+      .meta{
+        position:static;
       }
     }
 
@@ -423,6 +455,10 @@
       .btnSmall{
         width:auto;
       }
+
+      .kit{
+        padding:14px;
+      }
     }
   </style>
 </head>
@@ -442,17 +478,17 @@
           <div class="grid">
             <div class="field">
               <div class="label">ФИО</div>
-              <input class="input" id="fio" type="text" placeholder="Иванов Иван Иванович">
+              <input class="input" id="fio" type="text" placeholder="Иванов Иван Иванович" autocomplete="name">
             </div>
 
             <div class="field">
               <div class="label">Email</div>
-              <input class="input" id="email" type="email" placeholder="name@mail.ru">
+              <input class="input" id="email" type="email" placeholder="name@mail.ru" autocomplete="email">
             </div>
 
             <div class="field">
               <div class="label">Телефон</div>
-              <input class="input" id="phone" type="text" placeholder="+7 900 000-00-00">
+              <input class="input" id="phone" type="tel" placeholder="+7 900 000-00-00" autocomplete="tel">
             </div>
 
             <div class="field">
@@ -496,8 +532,8 @@
           </div>
 
           <div class="actions">
-            <button class="btn btnPrimary" id="btnLoad">Показать свободные комплекты</button>
-            <button class="btn btnGhost" id="btnBook" disabled>Забронировать выбранный комплект</button>
+            <button class="btn btnPrimary" id="btnLoad" type="button">Показать свободные комплекты</button>
+            <button class="btn btnGhost" id="btnBook" type="button" disabled>Забронировать выбранный комплект</button>
           </div>
 
           <div class="status info show" id="statusBox">
@@ -514,7 +550,7 @@
             <div class="metaBox">
               <div class="metaLabel">Статус API</div>
               <div class="metaValue">
-                <span class="apiBadge" id="apiBadge">Подключено</span>
+                <span class="apiBadge" id="apiBadge">Проверка подключения…</span>
               </div>
             </div>
 
@@ -567,6 +603,7 @@
     const apiBadge = document.getElementById("apiBadge");
 
     let selectedKit = "";
+    const descriptionCache = new Map();
 
     function setStatus(type, text){
       statusBox.className = "status show " + type;
@@ -582,6 +619,16 @@
         .replace(/'/g, "&#039;");
     }
 
+    function pad(num){
+      return String(num).padStart(2, "0");
+    }
+
+    function formatDateHuman(dateStr){
+      if (!dateStr) return "";
+      const [y,m,d] = dateStr.split("-");
+      return `${d}.${m}.${y}`;
+    }
+
     function formatApiDate(dateStr, timeStr){
       if (!dateStr || !timeStr) return "";
       const [y,m,d] = dateStr.split("-");
@@ -592,6 +639,51 @@
       const start = formatApiDate(startDateEl.value, startTimeEl.value);
       const end = formatApiDate(endDateEl.value, endTimeEl.value);
       return { start, end };
+    }
+
+    function getDateTimeValue(dateStr, timeStr){
+      if (!dateStr || !timeStr) return null;
+      return new Date(`${dateStr}T${timeStr}`);
+    }
+
+    function isPeriodValid(){
+      const startDt = getDateTimeValue(startDateEl.value, startTimeEl.value);
+      const endDt = getDateTimeValue(endDateEl.value, endTimeEl.value);
+      if (!startDt || !endDt) return false;
+      return endDt > startDt;
+    }
+
+    function updatePeriodBox(){
+      const start = formatApiDate(startDateEl.value, startTimeEl.value);
+      const end = formatApiDate(endDateEl.value, endTimeEl.value);
+      selectedPeriod.textContent = (start && end) ? `${start} — ${end}` : "—";
+    }
+
+    function resetSelection(){
+      selectedKit = "";
+      selectedKitName.textContent = "—";
+      btnBook.disabled = true;
+      document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll('input[name="kit"]').forEach(el => { el.checked = false; });
+    }
+
+    function setTodayMin(){
+      const now = new Date();
+      const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      startDateEl.min = today;
+      endDateEl.min = today;
+    }
+
+    function applyDefaultTimes(){
+      if (!startTimeEl.value) startTimeEl.value = "10:00";
+      if (!endTimeEl.value) endTimeEl.value = "18:00";
+    }
+
+    function syncDateConstraints(){
+      if (startDateEl.value) {
+        endDateEl.min = startDateEl.value;
+        if (!endDateEl.value) endDateEl.value = startDateEl.value;
+      }
     }
 
     async function apiGetKits(start, end){
@@ -606,13 +698,22 @@
     }
 
     async function apiGetKitDescription(kit){
+      if (descriptionCache.has(kit)) {
+        return { ok: true, description: descriptionCache.get(kit) };
+      }
+
       const url = new URL(API_URL);
       url.searchParams.set("action", "getKitDescription");
       url.searchParams.set("kit", kit);
 
       const res = await fetch(url.toString(), { method: "GET" });
       if (!res.ok) throw new Error("Ошибка сети при получении комплектации");
-      return await res.json();
+
+      const data = await res.json();
+      if (data && data.ok) {
+        descriptionCache.set(kit, data.description || "Комплектация не указана.");
+      }
+      return data;
     }
 
     async function apiCreateBooking(payload){
@@ -633,15 +734,33 @@
       return await res.json();
     }
 
+    function selectKit(kitName, card, radio){
+      const sameKitClicked = selectedKit === kitName;
+
+      document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll('input[name="kit"]').forEach(el => { el.checked = false; });
+
+      if (sameKitClicked) {
+        selectedKit = "";
+        selectedKitName.textContent = "—";
+        btnBook.disabled = true;
+        return;
+      }
+
+      selectedKit = kitName;
+      selectedKitName.textContent = kitName;
+      card.classList.add("selected");
+      radio.checked = true;
+      btnBook.disabled = false;
+    }
+
     function renderKits(kits){
       kitsList.innerHTML = "";
 
       if (!Array.isArray(kits) || !kits.length) {
         emptyBox.style.display = "block";
         emptyBox.textContent = "На выбранный период свободных комплектов нет.";
-        btnBook.disabled = true;
-        selectedKit = "";
-        selectedKitName.textContent = "—";
+        resetSelection();
         return;
       }
 
@@ -663,27 +782,41 @@
 
           <div class="kitDesc"></div>
 
-          <div class="kitPick">
+          <label class="kitPick">
             <input type="radio" name="kit" value="${escapeHtml(kitName)}" />
             <span>Выбрать этот комплект</span>
-          </div>
+          </label>
         `;
 
         const radio = card.querySelector("input[type='radio']");
         const descBtn = card.querySelector(".js-desc-btn");
         const descBox = card.querySelector(".kitDesc");
+        const pickLabel = card.querySelector(".kitPick");
 
-        radio.addEventListener("change", () => {
-          selectedKit = kitName;
-          selectedKitName.textContent = kitName;
+        const handleSelect = (e) => {
+          if (e) e.stopPropagation();
+          selectKit(kitName, card, radio);
+        };
 
-          document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
-          card.classList.add("selected");
-
-          btnBook.disabled = false;
+        radio.addEventListener("click", (e) => {
+          e.preventDefault();
+          handleSelect(e);
         });
 
-        descBtn.addEventListener("click", async () => {
+        pickLabel.addEventListener("click", handleSelect);
+
+        card.addEventListener("click", (e) => {
+          if (
+            e.target.closest(".js-desc-btn") ||
+            e.target.closest(".kitDesc") ||
+            e.target.closest("input")
+          ) return;
+          handleSelect(e);
+        });
+
+        descBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+
           if (descBox.classList.contains("show")) {
             descBox.classList.remove("show");
             descBtn.textContent = "Показать комплектацию";
@@ -702,8 +835,8 @@
             descBox.textContent = text;
             descBox.classList.add("show");
             descBtn.textContent = "Скрыть комплектацию";
-          } catch (e) {
-            descBox.textContent = e.message || "Ошибка загрузки комплектации.";
+          } catch (e2) {
+            descBox.textContent = e2.message || "Ошибка загрузки комплектации.";
             descBox.classList.add("show");
             descBtn.textContent = "Скрыть комплектацию";
           } finally {
@@ -715,21 +848,33 @@
       });
     }
 
-    btnLoad.addEventListener("click", async () => {
-      const { start, end } = getPeriod();
+    function validateBeforeLoad(){
+      updatePeriodBox();
 
-      selectedPeriod.textContent = (start && end) ? `${start} — ${end}` : "—";
-      selectedKit = "";
-      selectedKitName.textContent = "—";
-      btnBook.disabled = true;
-
-      if (!start || !end) {
+      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
         setStatus("error", "Заполните дату и время начала и окончания.");
-        return;
+        return false;
       }
+
+      if (!isPeriodValid()) {
+        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        return false;
+      }
+
+      return true;
+    }
+
+    btnLoad.addEventListener("click", async () => {
+      resetSelection();
+      updatePeriodBox();
+
+      if (!validateBeforeLoad()) return;
+
+      const { start, end } = getPeriod();
 
       try {
         btnLoad.disabled = true;
+        btnLoad.textContent = "Загрузка...";
         setStatus("info", "Загружаем свободные комплекты...");
 
         const result = await apiGetKits(start, end);
@@ -753,19 +898,20 @@
         setStatus("error", err.message || "Ошибка при загрузке комплектов.");
       } finally {
         btnLoad.disabled = false;
+        btnLoad.textContent = "Показать свободные комплекты";
       }
     });
 
     btnBook.addEventListener("click", async () => {
-      const { start, end } = getPeriod();
+      updatePeriodBox();
 
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
         phone: phoneEl.value.trim(),
         event: eventEl.value.trim(),
-        start,
-        end,
+        start: formatApiDate(startDateEl.value, startTimeEl.value),
+        end: formatApiDate(endDateEl.value, endTimeEl.value),
         kit: selectedKit,
         need_boom: needBoomEl.value.trim(),
         comment: commentEl.value.trim()
@@ -781,6 +927,11 @@
         return;
       }
 
+      if (!isPeriodValid()) {
+        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        return;
+      }
+
       if (!payload.kit) {
         setStatus("error", "Сначала выберите комплект.");
         return;
@@ -788,6 +939,7 @@
 
       try {
         btnBook.disabled = true;
+        btnBook.textContent = "Создание...";
         setStatus("info", "Создаём бронь...");
 
         const result = await apiCreateBooking(payload);
@@ -806,11 +958,28 @@
       } catch (err) {
         setStatus("error", err.message || "Ошибка при создании брони.");
       } finally {
-        btnBook.disabled = false;
+        btnBook.disabled = !selectedKit;
+        btnBook.textContent = "Забронировать выбранный комплект";
       }
     });
 
+    [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
+      el.addEventListener("change", () => {
+        syncDateConstraints();
+        updatePeriodBox();
+        resetSelection();
+        kitsList.innerHTML = "";
+        emptyBox.style.display = "block";
+        emptyBox.textContent = "После изменения периода нажмите «Показать свободные комплекты» заново.";
+      });
+    });
+
     (async function init(){
+      setTodayMin();
+      applyDefaultTimes();
+      syncDateConstraints();
+      updatePeriodBox();
+
       try {
         const url = new URL(API_URL);
         url.searchParams.set("action", "ping");
@@ -819,10 +988,12 @@
         const data = await res.json();
 
         if (!data.ok) throw new Error("Ping error");
+
+        apiBadge.textContent = "Подключено";
+        apiBadge.classList.remove("error");
       } catch (e) {
         apiBadge.textContent = "Ошибка подключения";
-        apiBadge.style.background = "rgba(239,68,68,.12)";
-        apiBadge.style.borderColor = "rgba(239,68,68,.28)";
+        apiBadge.classList.add("error");
         setStatus("error", "Не удалось подключиться к Apps Script API.");
       }
     })();
