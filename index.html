@@ -145,7 +145,7 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease), transform .15s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease);
     }
 
     .input:focus,
@@ -205,6 +205,16 @@
     }
 
     .btnGhost{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .btnSmall{
+      min-height:38px;
+      padding:0 12px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:700;
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
     }
@@ -286,7 +296,7 @@
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
       padding:16px;
-      transition:border-color .18s var(--ease), background .18s var(--ease), transform .15s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease);
     }
 
     .kit.selected{
@@ -308,11 +318,16 @@
     }
 
     .kitDesc{
-      margin-top:8px;
+      margin-top:10px;
       font-size:14px;
       color:var(--muted);
       line-height:1.5;
       white-space:pre-wrap;
+      display:none;
+    }
+
+    .kitDesc.show{
+      display:block;
     }
 
     .kitPick{
@@ -322,6 +337,13 @@
       margin-top:14px;
       font-size:14px;
       color:rgba(255,255,255,.94);
+    }
+
+    .kitActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
     }
 
     .empty{
@@ -397,6 +419,10 @@
       .btn{
         width:100%;
       }
+
+      .btnSmall{
+        width:auto;
+      }
     }
   </style>
 </head>
@@ -405,7 +431,7 @@
     <div class="hero">
       <div class="logo">ТЖК</div>
       <h1>Лист бронирования</h1>
-      <p>Выберите период, посмотрите свободные комплекты и отправьте заявку на бронирование через интерфейс, подключённый к Google Sheets.</p>
+      <p>Выберите даты и время, посмотрите свободные комплекты и отправьте заявку на бронирование через интерфейс, подключённый к Google Sheets.</p>
     </div>
 
     <div class="layout">
@@ -435,15 +461,23 @@
             </div>
 
             <div class="field">
-              <div class="label">Начало</div>
-              <input class="input" id="start" type="text" placeholder="10.03.2026 12:00">
-              <div class="hint">Формат: дд.мм.гггг чч:мм</div>
+              <div class="label">Дата выдачи</div>
+              <input class="input" id="startDate" type="date">
             </div>
 
             <div class="field">
-              <div class="label">Окончание</div>
-              <input class="input" id="end" type="text" placeholder="10.03.2026 14:00">
-              <div class="hint">Формат: дд.мм.гггг чч:мм</div>
+              <div class="label">Время выдачи</div>
+              <input class="input" id="startTime" type="time">
+            </div>
+
+            <div class="field">
+              <div class="label">Дата возврата</div>
+              <input class="input" id="endDate" type="date">
+            </div>
+
+            <div class="field">
+              <div class="label">Время возврата</div>
+              <input class="input" id="endTime" type="time">
             </div>
 
             <div class="field">
@@ -467,7 +501,7 @@
           </div>
 
           <div class="status info show" id="statusBox">
-            Сначала укажите даты и время, затем нажмите «Показать свободные комплекты».
+            Сначала выберите даты и время, затем нажмите «Показать свободные комплекты».
           </div>
         </div>
       </section>
@@ -513,8 +547,12 @@
     const emailEl = document.getElementById("email");
     const phoneEl = document.getElementById("phone");
     const eventEl = document.getElementById("event");
-    const startEl = document.getElementById("start");
-    const endEl = document.getElementById("end");
+
+    const startDateEl = document.getElementById("startDate");
+    const startTimeEl = document.getElementById("startTime");
+    const endDateEl = document.getElementById("endDate");
+    const endTimeEl = document.getElementById("endTime");
+
     const needBoomEl = document.getElementById("needBoom");
     const commentEl = document.getElementById("comment");
 
@@ -529,7 +567,6 @@
     const apiBadge = document.getElementById("apiBadge");
 
     let selectedKit = "";
-    let lastLoadedKits = [];
 
     function setStatus(type, text){
       statusBox.className = "status show " + type;
@@ -545,6 +582,18 @@
         .replace(/'/g, "&#039;");
     }
 
+    function formatApiDate(dateStr, timeStr){
+      if (!dateStr || !timeStr) return "";
+      const [y,m,d] = dateStr.split("-");
+      return `${d}.${m}.${y} ${timeStr}`;
+    }
+
+    function getPeriod(){
+      const start = formatApiDate(startDateEl.value, startTimeEl.value);
+      const end = formatApiDate(endDateEl.value, endTimeEl.value);
+      return { start, end };
+    }
+
     async function apiGetKits(start, end){
       const url = new URL(API_URL);
       url.searchParams.set("action", "getKits");
@@ -552,11 +601,17 @@
       url.searchParams.set("end", end);
 
       const res = await fetch(url.toString(), { method: "GET" });
+      if (!res.ok) throw new Error("Ошибка сети при получении комплектов");
+      return await res.json();
+    }
 
-      if (!res.ok) {
-        throw new Error("Ошибка сети при получении комплектов");
-      }
+    async function apiGetKitDescription(kit){
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "getKitDescription");
+      url.searchParams.set("kit", kit);
 
+      const res = await fetch(url.toString(), { method: "GET" });
+      if (!res.ok) throw new Error("Ошибка сети при получении комплектации");
       return await res.json();
     }
 
@@ -574,11 +629,7 @@
       url.searchParams.set("comment", payload.comment);
 
       const res = await fetch(url.toString(), { method: "GET" });
-
-      if (!res.ok) {
-        throw new Error("Ошибка сети при создании брони");
-      }
-
+      if (!res.ok) throw new Error("Ошибка сети при создании брони");
       return await res.json();
     }
 
@@ -605,6 +656,13 @@
           <div class="kitHead">
             <div class="kitName">${escapeHtml(kitName)}</div>
           </div>
+
+          <div class="kitActions">
+            <button type="button" class="btnSmall js-desc-btn">Показать комплектацию</button>
+          </div>
+
+          <div class="kitDesc"></div>
+
           <div class="kitPick">
             <input type="radio" name="kit" value="${escapeHtml(kitName)}" />
             <span>Выбрать этот комплект</span>
@@ -612,6 +670,9 @@
         `;
 
         const radio = card.querySelector("input[type='radio']");
+        const descBtn = card.querySelector(".js-desc-btn");
+        const descBox = card.querySelector(".kitDesc");
+
         radio.addEventListener("change", () => {
           selectedKit = kitName;
           selectedKitName.textContent = kitName;
@@ -622,13 +683,40 @@
           btnBook.disabled = false;
         });
 
+        descBtn.addEventListener("click", async () => {
+          if (descBox.classList.contains("show")) {
+            descBox.classList.remove("show");
+            descBtn.textContent = "Показать комплектацию";
+            return;
+          }
+
+          try {
+            descBtn.disabled = true;
+            descBtn.textContent = "Загрузка...";
+
+            const result = await apiGetKitDescription(kitName);
+            const text = result && result.ok
+              ? (result.description || "Комплектация не указана.")
+              : (result.message || "Не удалось загрузить комплектацию.");
+
+            descBox.textContent = text;
+            descBox.classList.add("show");
+            descBtn.textContent = "Скрыть комплектацию";
+          } catch (e) {
+            descBox.textContent = e.message || "Ошибка загрузки комплектации.";
+            descBox.classList.add("show");
+            descBtn.textContent = "Скрыть комплектацию";
+          } finally {
+            descBtn.disabled = false;
+          }
+        });
+
         kitsList.appendChild(card);
       });
     }
 
     btnLoad.addEventListener("click", async () => {
-      const start = startEl.value.trim();
-      const end = endEl.value.trim();
+      const { start, end } = getPeriod();
 
       selectedPeriod.textContent = (start && end) ? `${start} — ${end}` : "—";
       selectedKit = "";
@@ -636,7 +724,7 @@
       btnBook.disabled = true;
 
       if (!start || !end) {
-        setStatus("error", "Заполните поля «Начало» и «Окончание».");
+        setStatus("error", "Заполните дату и время начала и окончания.");
         return;
       }
 
@@ -652,11 +740,10 @@
           return;
         }
 
-        lastLoadedKits = result.kits || [];
-        renderKits(lastLoadedKits);
+        renderKits(result.kits || []);
 
-        if (lastLoadedKits.length) {
-          setStatus("success", "Свободные комплекты найдены. Выберите нужный комплект.");
+        if ((result.kits || []).length) {
+          setStatus("success", "Свободные комплекты найдены. Можно посмотреть комплектацию и выбрать нужный комплект.");
         } else {
           setStatus("info", "На выбранный период свободных комплектов нет.");
         }
@@ -670,13 +757,15 @@
     });
 
     btnBook.addEventListener("click", async () => {
+      const { start, end } = getPeriod();
+
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
         phone: phoneEl.value.trim(),
         event: eventEl.value.trim(),
-        start: startEl.value.trim(),
-        end: endEl.value.trim(),
+        start,
+        end,
         kit: selectedKit,
         need_boom: needBoomEl.value.trim(),
         comment: commentEl.value.trim()
@@ -688,7 +777,7 @@
       }
 
       if (!payload.start || !payload.end) {
-        setStatus("error", "Укажите даты и время.");
+        setStatus("error", "Укажите дату и время.");
         return;
       }
 
@@ -714,7 +803,6 @@
         }
 
         setStatus("error", result.message || "Не удалось создать бронь.");
-
       } catch (err) {
         setStatus("error", err.message || "Ошибка при создании брони.");
       } finally {
