@@ -76,14 +76,6 @@
       font-weight:800;
     }
 
-    .hero p{
-      max-width:640px;
-      margin:10px auto 0;
-      color:var(--muted);
-      font-size:15px;
-      line-height:1.5;
-    }
-
     .card{
       border-radius:var(--radius);
       border:1px solid var(--border);
@@ -138,8 +130,10 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
       font:inherit;
+      appearance:none;
+      -webkit-appearance:none;
     }
 
     .input:focus,
@@ -147,6 +141,7 @@
     .textarea:focus{
       border-color:rgba(59,130,246,.6);
       background:rgba(255,255,255,.07);
+      box-shadow:0 0 0 3px rgba(59,130,246,.08);
     }
 
     .input::placeholder,
@@ -167,7 +162,7 @@
     }
 
     .timeCardTitle{
-      font-size:13px;
+      font-size:14px;
       font-weight:800;
       margin:0 0 12px;
       color:rgba(255,255,255,.95);
@@ -177,6 +172,13 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
+    }
+
+    .timeInputWrap{
+      padding:10px;
+      border-radius:16px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.06);
     }
 
     .hint{
@@ -202,7 +204,7 @@
       font-weight:800;
       color:#fff;
       cursor:pointer;
-      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease);
+      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
       font:inherit;
     }
 
@@ -222,12 +224,6 @@
       box-shadow:0 12px 28px rgba(59,130,246,.18);
     }
 
-    .btnGhost{
-      width:100%;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-    }
-
     .btnSmall{
       min-height:42px;
       padding:0 14px;
@@ -239,6 +235,12 @@
       color:#fff;
       cursor:pointer;
       width:100%;
+    }
+
+    .btnSmall.selectedBtn{
+      background:linear-gradient(90deg, rgba(59,130,246,.9), rgba(34,197,94,.9));
+      border-color:rgba(255,255,255,.18);
+      box-shadow:0 8px 20px rgba(59,130,246,.18);
     }
 
     .status{
@@ -265,53 +267,18 @@
       border-color:rgba(239,68,68,.22);
     }
 
-    .meta{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      margin-bottom:18px;
-    }
-
-    .metaBox{
-      padding:14px 15px;
-      border-radius:18px;
+    .miniMeta{
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:16px;
       background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.08);
+      font-size:14px;
+      line-height:1.5;
     }
 
-    .metaLabel{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      color:var(--muted);
-      margin-bottom:7px;
-      font-weight:700;
-    }
-
-    .metaValue{
-      font-size:15px;
-      line-height:1.45;
-      word-break:break-word;
-      white-space:pre-wrap;
-    }
-
-    .apiBadge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.24);
-      color:#d8ffe7;
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .apiBadge.error{
-      background:rgba(239,68,68,.12);
-      border-color:rgba(239,68,68,.28);
-      color:#ffd9d9;
+    .miniMeta strong{
+      color:rgba(255,255,255,.96);
     }
 
     .kits{
@@ -419,11 +386,35 @@
     }
 
     .footer{
-      margin-top:16px;
+      margin-top:14px;
       text-align:center;
       color:var(--muted);
-      font-size:12px;
+      font-size:11px;
       line-height:1.5;
+    }
+
+    .footer .apiInline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .apiDot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 12px rgba(34,197,94,.5);
+      flex:0 0 auto;
+    }
+
+    .apiDot.error{
+      background:#ef4444;
+      box-shadow:0 0 12px rgba(239,68,68,.5);
     }
 
     @media (max-width:640px){
@@ -440,10 +431,6 @@
 
       .hero h1{
         font-size:34px;
-      }
-
-      .hero p{
-        font-size:14px;
       }
 
       .cardInner{
@@ -468,6 +455,12 @@
       .textarea{
         min-height:54px;
         font-size:16px;
+        background:rgba(255,255,255,.065);
+      }
+
+      .timeInputWrap{
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(255,255,255,.08);
       }
     }
   </style>
@@ -479,7 +472,6 @@
       <div class="hero">
         <div class="logo">ТЖК</div>
         <h1>Лист бронирования</h1>
-        <p>Выберите даты и время, посмотрите свободные комплекты и отправьте заявку на бронирование через интерфейс, подключённый к Google Sheets.</p>
       </div>
 
       <section class="card">
@@ -509,15 +501,19 @@
 
             <div class="field full">
               <div class="timeCard">
-                <div class="timeCardTitle">Дата начала</div>
+                <div class="timeCardTitle">Начало</div>
                 <div class="timeCardGrid">
                   <div class="field">
-                    <div class="label">Дата начала</div>
-                    <input class="input" id="startDate" type="date">
+                    <div class="label">Дата</div>
+                    <div class="timeInputWrap">
+                      <input class="input" id="startDate" type="date">
+                    </div>
                   </div>
                   <div class="field">
-                    <div class="label">Время начала</div>
-                    <input class="input" id="startTime" type="time">
+                    <div class="label">Время</div>
+                    <div class="timeInputWrap">
+                      <input class="input" id="startTime" type="time">
+                    </div>
                   </div>
                 </div>
                 <div class="hint">Рабочие дни: Пн–Пт. Время выдачи: 10:30–17:10</div>
@@ -526,15 +522,19 @@
 
             <div class="field full">
               <div class="timeCard">
-                <div class="timeCardTitle">Дата окончания</div>
+                <div class="timeCardTitle">Окончание</div>
                 <div class="timeCardGrid">
                   <div class="field">
-                    <div class="label">Дата окончания</div>
-                    <input class="input" id="endDate" type="date">
+                    <div class="label">Дата</div>
+                    <div class="timeInputWrap">
+                      <input class="input" id="endDate" type="date">
+                    </div>
                   </div>
                   <div class="field">
-                    <div class="label">Время окончания</div>
-                    <input class="input" id="endTime" type="time">
+                    <div class="label">Время</div>
+                    <div class="timeInputWrap">
+                      <input class="input" id="endTime" type="time">
+                    </div>
                   </div>
                 </div>
                 <div class="hint">Шаг времени: 10 минут</div>
@@ -556,23 +556,8 @@
         <div class="cardInner">
           <h2 class="cardTitle">Доступные комплекты</h2>
 
-          <div class="meta">
-            <div class="metaBox">
-              <div class="metaLabel">Статус API</div>
-              <div class="metaValue">
-                <span class="apiBadge" id="apiBadge">Проверка подключения…</span>
-              </div>
-            </div>
-
-            <div class="metaBox">
-              <div class="metaLabel">Выбранный период</div>
-              <div class="metaValue" id="selectedPeriod">—</div>
-            </div>
-
-            <div class="metaBox">
-              <div class="metaLabel">Выбранный комплект</div>
-              <div class="metaValue" id="selectedKitName">—</div>
-            </div>
+          <div class="miniMeta">
+            <strong>Выбранный комплект:</strong> <span id="selectedKitName">—</span>
           </div>
 
           <div class="kits" id="kitsList"></div>
@@ -605,7 +590,10 @@
       </section>
 
       <div class="footer">
-        Рабочий API подключён к Apps Script и Google Sheets.
+        <span class="apiInline">
+          <span class="apiDot" id="apiDot"></span>
+          <span id="apiText">Проверка подключения…</span>
+        </span>
       </div>
     </div>
 
@@ -615,8 +603,8 @@
           <div class="successIcon">✓</div>
           <h2 class="successTitle">Спасибо за бронирование</h2>
           <p class="successText">
-            Ваша заявка успешно отправлена на рассмотрение.<br>
-            После проверки брони вы получите дальнейшую информацию.
+            Ожидайте рассмотрения заявки.<br>
+            По результату на вашу почту придёт письмо с подтверждением.
           </p>
           <button class="btn btnPrimary" id="btnBackToForm" type="button">Вернуться к новому бронированию</button>
         </div>
@@ -923,9 +911,9 @@ SD карточка 32\\64гб (опционально)
     const statusBox = document.getElementById("statusBox");
     const kitsList = document.getElementById("kitsList");
     const emptyBox = document.getElementById("emptyBox");
-    const selectedPeriod = document.getElementById("selectedPeriod");
     const selectedKitName = document.getElementById("selectedKitName");
-    const apiBadge = document.getElementById("apiBadge");
+    const apiDot = document.getElementById("apiDot");
+    const apiText = document.getElementById("apiText");
 
     let selectedKit = "";
 
@@ -965,17 +953,16 @@ SD карточка 32\\64гб (опционально)
       return endDt > startDt;
     }
 
-    function updatePeriodBox(){
-      const start = formatApiDate(startDateEl.value, startTimeEl.value);
-      const end = formatApiDate(endDateEl.value, endTimeEl.value);
-      selectedPeriod.textContent = (start && end) ? `${start} — ${end}` : "—";
-    }
-
     function resetSelection(){
       selectedKit = "";
       selectedKitName.textContent = "—";
       btnBook.disabled = true;
+
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll(".js-pick-btn").forEach(btn => {
+        btn.classList.remove("selectedBtn");
+        btn.textContent = "Выбрать этот комплект";
+      });
     }
 
     function setTodayMin(){
@@ -1026,10 +1013,14 @@ SD карточка 32\\64гб (опционально)
       return await res.json();
     }
 
-    function selectKit(kitName, card){
+    function selectKit(kitName, card, pickBtn){
       const isSame = selectedKit === kitName;
 
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll(".js-pick-btn").forEach(btn => {
+        btn.classList.remove("selectedBtn");
+        btn.textContent = "Выбрать этот комплект";
+      });
 
       if (isSame) {
         selectedKit = "";
@@ -1041,6 +1032,8 @@ SD карточка 32\\64гб (опционально)
       selectedKit = kitName;
       selectedKitName.textContent = kitName;
       card.classList.add("selected");
+      pickBtn.classList.add("selectedBtn");
+      pickBtn.textContent = "Комплект выбран";
       btnBook.disabled = false;
     }
 
@@ -1087,7 +1080,7 @@ SD карточка 32\\64гб (опционально)
         });
 
         pickBtn.addEventListener("click", () => {
-          selectKit(kitName, card);
+          selectKit(kitName, card, pickBtn);
         });
 
         kitsList.appendChild(card);
@@ -1109,7 +1102,6 @@ SD карточка 32\\64гб (опционально)
       emptyBox.style.display = "block";
       emptyBox.textContent = "Комплекты пока не загружены.";
       resetSelection();
-      updatePeriodBox();
       syncDateConstraints();
       setStatus("info", "Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».");
     }
@@ -1129,7 +1121,6 @@ SD карточка 32\\64гб (опционально)
 
     btnLoad.addEventListener("click", async () => {
       resetSelection();
-      updatePeriodBox();
 
       if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
         setStatus("error", "Заполните дату и время начала и окончания.");
@@ -1240,7 +1231,6 @@ SD карточка 32\\64гб (опционально)
     [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
       el.addEventListener("change", () => {
         syncDateConstraints();
-        updatePeriodBox();
         resetSelection();
         kitsList.innerHTML = "";
         emptyBox.style.display = "block";
@@ -1252,7 +1242,6 @@ SD карточка 32\\64гб (опционально)
       setTodayMin();
       applyDefaultTimes();
       syncDateConstraints();
-      updatePeriodBox();
 
       try {
         const url = new URL(API_URL);
@@ -1263,11 +1252,11 @@ SD карточка 32\\64гб (опционально)
 
         if (!data.ok) throw new Error("Ping error");
 
-        apiBadge.textContent = "Подключено";
-        apiBadge.classList.remove("error");
+        apiText.textContent = "API подключён";
+        apiDot.classList.remove("error");
       } catch (e) {
-        apiBadge.textContent = "Ошибка подключения";
-        apiBadge.classList.add("error");
+        apiText.textContent = "Ошибка подключения API";
+        apiDot.classList.add("error");
         setStatus("error", "Не удалось подключиться к Apps Script API.");
       }
     })();
