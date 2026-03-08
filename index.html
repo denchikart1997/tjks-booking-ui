@@ -32,24 +32,48 @@
       margin:0;
       padding:0;
       min-height:100%;
+      min-height:100dvh;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       color:var(--text);
+      background:#050A14;
+      overscroll-behavior-y:none;
+    }
+
+    body{
+      position:relative;
+      padding:18px 12px 24px;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-2;
       background:
         radial-gradient(circle at 15% 15%, rgba(59,130,246,.18), transparent 24%),
         radial-gradient(circle at 85% 15%, rgba(34,197,94,.12), transparent 22%),
         radial-gradient(circle at 50% 100%, rgba(59,130,246,.08), transparent 28%),
         linear-gradient(180deg, var(--bg1), var(--bg0));
-      background-attachment:fixed;
+      background-color:#050A14;
     }
 
-    body{
-      padding:18px 12px 24px;
+    body::after{
+      content:"";
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      height:calc(env(safe-area-inset-bottom, 0px) + 24px);
+      background:#050A14;
+      z-index:-1;
+      pointer-events:none;
     }
 
     .page{
       width:100%;
       max-width:760px;
       margin:0 auto;
+      padding-bottom:12px;
     }
 
     .hero{
@@ -254,6 +278,7 @@
       -webkit-touch-callout:none;
       touch-action:manipulation;
       box-shadow:none;
+      position:relative;
     }
 
     .btn:hover{ transform:translateY(-1px); }
@@ -298,12 +323,38 @@
       appearance:none;
       -webkit-appearance:none;
       -moz-appearance:none;
+      position:relative;
     }
 
     .btnSmall.selectedBtn{
       background:linear-gradient(90deg, rgba(59,130,246,.9), rgba(34,197,94,.9));
       border-color:rgba(255,255,255,.18);
       box-shadow:0 8px 20px rgba(59,130,246,.18);
+    }
+
+    .btn.loading,
+    .btnSmall.loading{
+      color:transparent !important;
+      pointer-events:none;
+    }
+
+    .btn.loading::after,
+    .btnSmall.loading::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:18px;
+      height:18px;
+      margin:-9px 0 0 -9px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.28);
+      border-top-color:#fff;
+      animation:spin .8s linear infinite;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
     }
 
     .status{
@@ -405,6 +456,15 @@
       font-size:14px;
       line-height:1.5;
       padding-top:4px;
+    }
+
+    .kitsSectionCard{
+      display:none;
+    }
+
+    .kitsSectionCard.show{
+      display:block;
+      animation:fadeInSection .22s ease;
     }
 
     .extrasSectionCard{
@@ -637,7 +697,7 @@
         </div>
       </section>
 
-      <section class="card">
+      <section class="card kitsSectionCard" id="kitsSectionCard">
         <div class="cardInner">
           <h2 class="cardTitle">Доступные комплекты</h2>
 
@@ -993,6 +1053,7 @@ SD карточка 32\\64гб (опционально)
 
     const needBoomEl = document.getElementById("needBoom");
     const commentEl = document.getElementById("comment");
+    const kitsSectionCard = document.getElementById("kitsSectionCard");
     const extrasSectionCard = document.getElementById("extrasSectionCard");
 
     const btnLoad = document.getElementById("btnLoad");
@@ -1065,6 +1126,18 @@ SD карточка 32\\64гб (опционально)
       return endDt > startDt;
     }
 
+    function setButtonLoading(button, isLoading){
+      button.classList.toggle("loading", isLoading);
+    }
+
+    function showKitsSection(){
+      kitsSectionCard.classList.add("show");
+    }
+
+    function hideKitsSection(){
+      kitsSectionCard.classList.remove("show");
+    }
+
     function hideExtrasSection(){
       extrasSectionCard.classList.remove("show");
       needBoomEl.value = "";
@@ -1077,6 +1150,51 @@ SD карточка 32\\64гб (опционально)
       btnBook.disabled = !selectedKit;
     }
 
+    function scrollToBookButton(){
+      setTimeout(() => {
+        btnBook.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 160);
+    }
+
+    function validateBookingFields(){
+      if (!fioEl.value.trim()) {
+        setStatus("error", "Заполните поле ФИО.");
+        return false;
+      }
+
+      if (!emailEl.value.trim()) {
+        setStatus("error", "Заполните поле Email.");
+        return false;
+      }
+
+      if (!phoneEl.value.trim()) {
+        setStatus("error", "Заполните поле Телефон.");
+        return false;
+      }
+
+      if (!eventEl.value.trim()) {
+        setStatus("error", "Заполните поле Мероприятие.");
+        return false;
+      }
+
+      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
+        setStatus("error", "Заполните дату и время начала и окончания.");
+        return false;
+      }
+
+      if (!isPeriodValid()) {
+        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        return false;
+      }
+
+      if (!selectedKit) {
+        setStatus("error", "Сначала выберите комплект.");
+        return false;
+      }
+
+      return true;
+    }
+
     function resetSelection(){
       selectedKit = "";
       selectedKitName.textContent = "—";
@@ -1084,7 +1202,9 @@ SD карточка 32\\64гб (опционально)
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
       document.querySelectorAll(".js-pick-btn").forEach(btn => {
         btn.classList.remove("selectedBtn");
+        btn.classList.remove("loading");
         btn.textContent = "Выбрать этот комплект";
+        btn.disabled = false;
       });
 
       hideExtrasSection();
@@ -1138,19 +1258,15 @@ SD карточка 32\\64гб (опционально)
       return await res.json();
     }
 
-    function scrollToBookButton(){
-      setTimeout(() => {
-        btnBook.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 160);
-    }
-
     function selectKit(kitName, card, pickBtn){
       const isSame = selectedKit === kitName;
 
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
       document.querySelectorAll(".js-pick-btn").forEach(btn => {
         btn.classList.remove("selectedBtn");
+        btn.classList.remove("loading");
         btn.textContent = "Выбрать этот комплект";
+        btn.disabled = false;
       });
 
       if (isSame) {
@@ -1216,7 +1332,12 @@ SD карточка 32\\64гб (опционально)
 
         pickBtn.addEventListener("click", (e) => {
           e.preventDefault();
-          selectKit(kitName, card, pickBtn);
+          setButtonLoading(pickBtn, true);
+
+          setTimeout(() => {
+            setButtonLoading(pickBtn, false);
+            selectKit(kitName, card, pickBtn);
+          }, 220);
         });
 
         kitsList.appendChild(card);
@@ -1237,6 +1358,7 @@ SD карточка 32\\64гб (опционально)
       kitsList.innerHTML = "";
       emptyBox.style.display = "block";
       emptyBox.textContent = "Комплекты пока не загружены.";
+      hideKitsSection();
       resetSelection();
       syncDateConstraints();
       updateDateDisplays();
@@ -1258,6 +1380,7 @@ SD карточка 32\\64гб (опционально)
 
     btnLoad.addEventListener("click", async () => {
       resetSelection();
+      hideKitsSection();
 
       if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
         setStatus("error", "Заполните дату и время начала и окончания.");
@@ -1274,10 +1397,12 @@ SD карточка 32\\64гб (опционально)
 
       try {
         btnLoad.disabled = true;
-        btnLoad.textContent = "Загрузка...";
+        btnLoad.classList.add("loading");
         setStatus("info", "Загружаем доступные комплекты...");
 
         const result = await apiGetKits(start, end);
+
+        showKitsSection();
 
         if (!result.ok) {
           renderKits([]);
@@ -1293,15 +1418,18 @@ SD карточка 32\\64гб (опционально)
           setStatus("info", "На выбранный период свободных комплектов нет.");
         }
       } catch (err) {
+        showKitsSection();
         renderKits([]);
         setStatus("error", err.message || "Ошибка при загрузке комплектов.");
       } finally {
         btnLoad.disabled = false;
-        btnLoad.textContent = "Показать доступные комплекты";
+        btnLoad.classList.remove("loading");
       }
     });
 
     btnBook.addEventListener("click", async () => {
+      if (!validateBookingFields()) return;
+
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
@@ -1314,29 +1442,9 @@ SD карточка 32\\64гб (опционально)
         comment: commentEl.value.trim()
       };
 
-      if (!payload.fio || !payload.email || !payload.phone || !payload.event) {
-        setStatus("error", "Заполните ФИО, Email, Телефон и Мероприятие.");
-        return;
-      }
-
-      if (!payload.start || !payload.end) {
-        setStatus("error", "Укажите дату и время.");
-        return;
-      }
-
-      if (!isPeriodValid()) {
-        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
-        return;
-      }
-
-      if (!payload.kit) {
-        setStatus("error", "Сначала выберите комплект.");
-        return;
-      }
-
       try {
         btnBook.disabled = true;
-        btnBook.textContent = "Создание...";
+        btnBook.classList.add("loading");
         setStatus("info", "Создаём бронь...");
 
         const result = await apiCreateBooking(payload);
@@ -1349,7 +1457,7 @@ SD карточка 32\\64гб (опционально)
         if (result.status === "occupied") {
           setStatus("error", "Пока вы оформляли заявку, комплект уже заняли. Обновите список.");
           btnBook.disabled = false;
-          btnBook.textContent = "Забронировать выбранный комплект";
+          btnBook.classList.remove("loading");
           return;
         }
 
@@ -1359,7 +1467,7 @@ SD карточка 32\\64гб (опционально)
       } finally {
         if (successScreen.classList.contains("show")) return;
         btnBook.disabled = !selectedKit;
-        btnBook.textContent = "Забронировать выбранный комплект";
+        btnBook.classList.remove("loading");
       }
     });
 
@@ -1370,6 +1478,7 @@ SD карточка 32\\64гб (опционально)
         syncDateConstraints();
         updateDateDisplays();
         resetSelection();
+        hideKitsSection();
         kitsList.innerHTML = "";
         emptyBox.style.display = "block";
         emptyBox.textContent = "После изменения периода нажмите «Показать доступные комплекты» заново.";
@@ -1384,6 +1493,7 @@ SD карточка 32\\64гб (опционально)
       applyDefaultTimes();
       syncDateConstraints();
       updateDateDisplays();
+      hideKitsSection();
       hideExtrasSection();
 
       try {
