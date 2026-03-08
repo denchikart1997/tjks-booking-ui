@@ -14,6 +14,7 @@
       --border:rgba(255,255,255,.12);
       --text:rgba(255,255,255,.94);
       --muted:rgba(255,255,255,.62);
+      --muted2:rgba(255,255,255,.38);
       --brand:#22c55e;
       --brand2:#3b82f6;
       --danger:#ef4444;
@@ -22,7 +23,10 @@
       --ease:cubic-bezier(.22,1,.36,1);
     }
 
-    *{box-sizing:border-box}
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
 
     html,body{
       margin:0;
@@ -67,6 +71,7 @@
       font-size:24px;
       font-weight:800;
       letter-spacing:.04em;
+      user-select:none;
     }
 
     .hero h1{
@@ -130,7 +135,7 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease), opacity .18s var(--ease);
       font:inherit;
       appearance:none;
       -webkit-appearance:none;
@@ -138,7 +143,8 @@
 
     .input:focus,
     .select:focus,
-    .textarea:focus{
+    .textarea:focus,
+    .fakeDateBox.focused{
       border-color:rgba(59,130,246,.6);
       background:rgba(255,255,255,.07);
       box-shadow:0 0 0 3px rgba(59,130,246,.08);
@@ -174,18 +180,55 @@
       gap:12px;
     }
 
-    .timeInputWrap{
-      padding:10px;
-      border-radius:16px;
-      background:rgba(255,255,255,.045);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
     .hint{
       margin-top:10px;
       font-size:12px;
       line-height:1.45;
       color:var(--muted);
+    }
+
+    .fakeDateWrap{
+      position:relative;
+      width:100%;
+    }
+
+    .fakeDateBox{
+      min-height:50px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      position:relative;
+      cursor:pointer;
+      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+    }
+
+    .fakeDateValue{
+      pointer-events:none;
+      color:var(--muted2);
+      user-select:none;
+    }
+
+    .fakeDateValue.filled{
+      color:var(--text);
+    }
+
+    .realDateInput{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      opacity:0;
+      cursor:pointer;
+      border:none;
+      background:transparent;
+      color:transparent;
+      -webkit-appearance:none;
+      appearance:none;
+      outline:none;
     }
 
     .actions{
@@ -206,10 +249,23 @@
       cursor:pointer;
       transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
       font:inherit;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:manipulation;
+      box-shadow:none;
     }
 
     .btn:hover{ transform:translateY(-1px); }
     .btn:active{ transform:translateY(0); }
+
+    .btn:focus,
+    .btn:focus-visible,
+    .btnSmall:focus,
+    .btnSmall:focus-visible{
+      outline:none;
+      box-shadow:none;
+    }
 
     .btn[disabled]{
       opacity:.55;
@@ -235,6 +291,13 @@
       color:#fff;
       cursor:pointer;
       width:100%;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:manipulation;
+      appearance:none;
+      -webkit-appearance:none;
+      -moz-appearance:none;
     }
 
     .btnSmall.selectedBtn{
@@ -342,6 +405,26 @@
       font-size:14px;
       line-height:1.5;
       padding-top:4px;
+    }
+
+    .extrasSectionCard{
+      display:none;
+    }
+
+    .extrasSectionCard.show{
+      display:block;
+      animation:fadeInSection .22s ease;
+    }
+
+    @keyframes fadeInSection{
+      from{
+        opacity:0;
+        transform:translateY(8px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
     }
 
     .successScreen{
@@ -452,15 +535,15 @@
 
       .input,
       .select,
-      .textarea{
+      .textarea,
+      .fakeDateBox{
         min-height:54px;
         font-size:16px;
-        background:rgba(255,255,255,.065);
       }
 
-      .timeInputWrap{
-        background:rgba(255,255,255,.06);
-        border:1px solid rgba(255,255,255,.08);
+      .btn,
+      .btnSmall{
+        -webkit-tap-highlight-color:transparent;
       }
     }
   </style>
@@ -505,15 +588,16 @@
                 <div class="timeCardGrid">
                   <div class="field">
                     <div class="label">Дата</div>
-                    <div class="timeInputWrap">
-                      <input class="input" id="startDate" type="date">
+                    <div class="fakeDateWrap">
+                      <div class="fakeDateBox" id="startDateBox">
+                        <span class="fakeDateValue" id="startDateDisplay">дд.мм.гг</span>
+                        <input class="realDateInput" id="startDate" type="date">
+                      </div>
                     </div>
                   </div>
                   <div class="field">
                     <div class="label">Время</div>
-                    <div class="timeInputWrap">
-                      <input class="input" id="startTime" type="time">
-                    </div>
+                    <input class="input" id="startTime" type="time">
                   </div>
                 </div>
                 <div class="hint">Рабочие дни: Пн–Пт. Время выдачи: 10:30–17:10</div>
@@ -526,15 +610,16 @@
                 <div class="timeCardGrid">
                   <div class="field">
                     <div class="label">Дата</div>
-                    <div class="timeInputWrap">
-                      <input class="input" id="endDate" type="date">
+                    <div class="fakeDateWrap">
+                      <div class="fakeDateBox" id="endDateBox">
+                        <span class="fakeDateValue" id="endDateDisplay">дд.мм.гг</span>
+                        <input class="realDateInput" id="endDate" type="date">
+                      </div>
                     </div>
                   </div>
                   <div class="field">
                     <div class="label">Время</div>
-                    <div class="timeInputWrap">
-                      <input class="input" id="endTime" type="time">
-                    </div>
+                    <input class="input" id="endTime" type="time">
                   </div>
                 </div>
                 <div class="hint">Шаг времени: 10 минут</div>
@@ -565,7 +650,7 @@
         </div>
       </section>
 
-      <section class="card">
+      <section class="card extrasSectionCard" id="extrasSectionCard">
         <div class="cardInner">
           <div class="grid">
             <div class="field">
@@ -901,8 +986,14 @@ SD карточка 32\\64гб (опционально)
     const endDateEl = document.getElementById("endDate");
     const endTimeEl = document.getElementById("endTime");
 
+    const startDateDisplay = document.getElementById("startDateDisplay");
+    const endDateDisplay = document.getElementById("endDateDisplay");
+    const startDateBox = document.getElementById("startDateBox");
+    const endDateBox = document.getElementById("endDateBox");
+
     const needBoomEl = document.getElementById("needBoom");
     const commentEl = document.getElementById("comment");
+    const extrasSectionCard = document.getElementById("extrasSectionCard");
 
     const btnLoad = document.getElementById("btnLoad");
     const btnBook = document.getElementById("btnBook");
@@ -941,6 +1032,27 @@ SD карточка 32\\64гб (опционально)
       return `${d}.${m}.${y} ${timeStr}`;
     }
 
+    function formatDisplayDate(dateStr){
+      if (!dateStr) return "дд.мм.гг";
+      const [y,m,d] = dateStr.split("-");
+      return `${d}.${m}.${y.slice(2)}`;
+    }
+
+    function updateDateDisplays(){
+      startDateDisplay.textContent = formatDisplayDate(startDateEl.value);
+      endDateDisplay.textContent = formatDisplayDate(endDateEl.value);
+
+      startDateDisplay.classList.toggle("filled", !!startDateEl.value);
+      endDateDisplay.classList.toggle("filled", !!endDateEl.value);
+    }
+
+    function attachFakeDateFocus(input, box){
+      input.addEventListener("focus", () => box.classList.add("focused"));
+      input.addEventListener("blur", () => box.classList.remove("focused"));
+      input.addEventListener("change", updateDateDisplays);
+      input.addEventListener("input", updateDateDisplays);
+    }
+
     function getDateTimeValue(dateStr, timeStr){
       if (!dateStr || !timeStr) return null;
       return new Date(`${dateStr}T${timeStr}`);
@@ -953,16 +1065,29 @@ SD карточка 32\\64гб (опционально)
       return endDt > startDt;
     }
 
+    function hideExtrasSection(){
+      extrasSectionCard.classList.remove("show");
+      needBoomEl.value = "";
+      commentEl.value = "";
+      btnBook.disabled = true;
+    }
+
+    function showExtrasSection(){
+      extrasSectionCard.classList.add("show");
+      btnBook.disabled = !selectedKit;
+    }
+
     function resetSelection(){
       selectedKit = "";
       selectedKitName.textContent = "—";
-      btnBook.disabled = true;
 
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
       document.querySelectorAll(".js-pick-btn").forEach(btn => {
         btn.classList.remove("selectedBtn");
         btn.textContent = "Выбрать этот комплект";
       });
+
+      hideExtrasSection();
     }
 
     function setTodayMin(){
@@ -1013,6 +1138,12 @@ SD карточка 32\\64гб (опционально)
       return await res.json();
     }
 
+    function scrollToBookButton(){
+      setTimeout(() => {
+        btnBook.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 160);
+    }
+
     function selectKit(kitName, card, pickBtn){
       const isSame = selectedKit === kitName;
 
@@ -1025,7 +1156,7 @@ SD карточка 32\\64гб (опционально)
       if (isSame) {
         selectedKit = "";
         selectedKitName.textContent = "—";
-        btnBook.disabled = true;
+        hideExtrasSection();
         return;
       }
 
@@ -1034,7 +1165,10 @@ SD карточка 32\\64гб (опционально)
       card.classList.add("selected");
       pickBtn.classList.add("selectedBtn");
       pickBtn.textContent = "Комплект выбран";
+
+      showExtrasSection();
       btnBook.disabled = false;
+      scrollToBookButton();
     }
 
     function renderKits(kits){
@@ -1073,13 +1207,15 @@ SD карточка 32\\64гб (опционально)
         const pickBtn = card.querySelector(".js-pick-btn");
         const descBox = card.querySelector(".kitDesc");
 
-        descBtn.addEventListener("click", () => {
+        descBtn.addEventListener("click", (e) => {
+          e.preventDefault();
           const opened = descBox.classList.contains("show");
           descBox.classList.toggle("show");
           descBtn.textContent = opened ? "Посмотреть комплектацию" : "Скрыть комплектацию";
         });
 
-        pickBtn.addEventListener("click", () => {
+        pickBtn.addEventListener("click", (e) => {
+          e.preventDefault();
           selectKit(kitName, card, pickBtn);
         });
 
@@ -1103,6 +1239,7 @@ SD карточка 32\\64гб (опционально)
       emptyBox.textContent = "Комплекты пока не загружены.";
       resetSelection();
       syncDateConstraints();
+      updateDateDisplays();
       setStatus("info", "Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».");
     }
 
@@ -1231,6 +1368,7 @@ SD карточка 32\\64гб (опционально)
     [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
       el.addEventListener("change", () => {
         syncDateConstraints();
+        updateDateDisplays();
         resetSelection();
         kitsList.innerHTML = "";
         emptyBox.style.display = "block";
@@ -1238,10 +1376,15 @@ SD карточка 32\\64гб (опционально)
       });
     });
 
+    attachFakeDateFocus(startDateEl, startDateBox);
+    attachFakeDateFocus(endDateEl, endDateBox);
+
     (async function init(){
       setTodayMin();
       applyDefaultTimes();
       syncDateConstraints();
+      updateDateDisplays();
+      hideExtrasSection();
 
       try {
         const url = new URL(API_URL);
