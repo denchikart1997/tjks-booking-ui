@@ -17,10 +17,8 @@
       --brand:#22c55e;
       --brand2:#3b82f6;
       --danger:#ef4444;
-      --warning:#f59e0b;
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --radius:24px;
-      --radius-sm:18px;
       --ease:cubic-bezier(.22,1,.36,1);
     }
 
@@ -46,7 +44,7 @@
 
     .page{
       width:100%;
-      max-width:1180px;
+      max-width:760px;
       margin:0 auto;
     }
 
@@ -56,8 +54,8 @@
     }
 
     .logo{
-      width:84px;
-      height:84px;
+      width:92px;
+      height:92px;
       margin:0 auto 14px;
       border-radius:22px;
       border:1px solid rgba(255,255,255,.10);
@@ -66,31 +64,24 @@
       align-items:center;
       justify-content:center;
       box-shadow:var(--shadow);
-      font-size:26px;
+      font-size:24px;
       font-weight:800;
       letter-spacing:.04em;
     }
 
     .hero h1{
       margin:0;
-      font-size:clamp(30px,5vw,52px);
-      line-height:1.03;
+      font-size:clamp(28px,5vw,46px);
+      line-height:1.06;
       font-weight:800;
     }
 
     .hero p{
-      max-width:760px;
+      max-width:640px;
       margin:10px auto 0;
       color:var(--muted);
       font-size:15px;
       line-height:1.5;
-    }
-
-    .layout{
-      display:grid;
-      grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);
-      gap:18px;
-      align-items:start;
     }
 
     .card{
@@ -101,15 +92,16 @@
       backdrop-filter:blur(16px);
       -webkit-backdrop-filter:blur(16px);
       overflow:hidden;
+      margin-bottom:16px;
     }
 
     .cardInner{
-      padding:22px;
+      padding:20px;
     }
 
     .cardTitle{
       margin:0 0 16px;
-      font-size:20px;
+      font-size:19px;
       font-weight:800;
     }
 
@@ -146,7 +138,7 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease);
+      transition:border-color .18s var(--ease), background .18s var(--ease);
       font:inherit;
     }
 
@@ -167,7 +159,28 @@
       resize:vertical;
     }
 
+    .timeCard{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      padding:14px;
+    }
+
+    .timeCardTitle{
+      font-size:13px;
+      font-weight:800;
+      margin:0 0 12px;
+      color:rgba(255,255,255,.95);
+    }
+
+    .timeCardGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
     .hint{
+      margin-top:10px;
       font-size:12px;
       line-height:1.45;
       color:var(--muted);
@@ -189,12 +202,13 @@
       font-weight:800;
       color:#fff;
       cursor:pointer;
-      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease), background .18s var(--ease);
+      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease);
       font:inherit;
     }
 
     .btn:hover{ transform:translateY(-1px); }
     .btn:active{ transform:translateY(0); }
+
     .btn[disabled]{
       opacity:.55;
       cursor:not-allowed;
@@ -203,25 +217,28 @@
     }
 
     .btnPrimary{
+      width:100%;
       background:linear-gradient(90deg, var(--brand2), var(--brand));
       box-shadow:0 12px 28px rgba(59,130,246,.18);
     }
 
     .btnGhost{
+      width:100%;
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
     }
 
     .btnSmall{
-      min-height:38px;
-      padding:0 12px;
-      border-radius:12px;
-      font-size:13px;
+      min-height:42px;
+      padding:0 14px;
+      border-radius:14px;
+      font-size:14px;
       font-weight:700;
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
       color:#fff;
       cursor:pointer;
+      width:100%;
     }
 
     .status{
@@ -253,8 +270,6 @@
       flex-direction:column;
       gap:12px;
       margin-bottom:18px;
-      position:sticky;
-      top:12px;
     }
 
     .metaBox{
@@ -277,6 +292,7 @@
       font-size:15px;
       line-height:1.45;
       word-break:break-word;
+      white-space:pre-wrap;
     }
 
     .apiBadge{
@@ -309,69 +325,49 @@
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
       padding:16px;
-      transition:border-color .18s var(--ease), background .18s var(--ease), transform .18s var(--ease);
-    }
-
-    .kit:hover{
-      border-color:rgba(255,255,255,.16);
-      background:rgba(255,255,255,.055);
+      transition:border-color .18s var(--ease), background .18s var(--ease);
     }
 
     .kit.selected{
       border-color:rgba(59,130,246,.72);
       background:rgba(59,130,246,.11);
-      box-shadow:0 0 0 1px rgba(59,130,246,.14) inset;
-    }
-
-    .kitHead{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      justify-content:space-between;
     }
 
     .kitName{
       font-size:16px;
       font-weight:800;
       line-height:1.35;
+      margin-bottom:12px;
+    }
+
+    .kitActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
 
     .kitDesc{
-      margin-top:10px;
-      font-size:14px;
-      color:var(--muted);
+      margin-top:12px;
+      font-size:13px;
+      color:rgba(255,255,255,.88);
       line-height:1.5;
       white-space:pre-wrap;
       display:none;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.06);
     }
 
     .kitDesc.show{
       display:block;
     }
 
-    .kitPick{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-top:14px;
-      font-size:14px;
-      color:rgba(255,255,255,.94);
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .kitPick input{
-      accent-color:#3b82f6;
-      width:18px;
-      height:18px;
-      flex:0 0 auto;
-    }
-
-    .kitActions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:12px;
+    .kitHint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
     }
 
     .empty{
@@ -379,6 +375,47 @@
       font-size:14px;
       line-height:1.5;
       padding-top:4px;
+    }
+
+    .successScreen{
+      display:none;
+    }
+
+    .successScreen.show{
+      display:block;
+    }
+
+    .successBox{
+      text-align:center;
+      padding:28px 20px;
+    }
+
+    .successIcon{
+      width:74px;
+      height:74px;
+      margin:0 auto 16px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      font-weight:800;
+      background:rgba(34,197,94,.14);
+      border:1px solid rgba(34,197,94,.24);
+      color:#d8ffe7;
+    }
+
+    .successTitle{
+      margin:0 0 10px;
+      font-size:28px;
+      font-weight:800;
+    }
+
+    .successText{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:15px;
     }
 
     .footer{
@@ -389,34 +426,20 @@
       line-height:1.5;
     }
 
-    @media (max-width:980px){
-      .layout{
-        grid-template-columns:1fr;
-      }
-
-      .meta{
-        position:static;
-      }
-    }
-
     @media (max-width:640px){
       body{
         padding:12px 10px 20px;
       }
 
-      .hero{
-        margin-bottom:12px;
-      }
-
       .logo{
-        width:68px;
-        height:68px;
+        width:72px;
+        height:72px;
         border-radius:18px;
-        font-size:22px;
+        font-size:20px;
       }
 
       .hero h1{
-        font-size:38px;
+        font-size:34px;
       }
 
       .hero p{
@@ -427,50 +450,38 @@
         padding:16px;
       }
 
-      .cardTitle{
-        font-size:18px;
-      }
-
       .grid{
         grid-template-columns:1fr;
         gap:12px;
+      }
+
+      .timeCardGrid{
+        grid-template-columns:1fr;
+      }
+
+      .kitActions{
+        grid-template-columns:1fr 1fr;
       }
 
       .input,
       .select,
       .textarea{
         min-height:54px;
-        padding:15px 14px;
         font-size:16px;
-      }
-
-      .actions{
-        flex-direction:column;
-      }
-
-      .btn{
-        width:100%;
-      }
-
-      .btnSmall{
-        width:auto;
-      }
-
-      .kit{
-        padding:14px;
       }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="hero">
-      <div class="logo">ТЖК</div>
-      <h1>Лист бронирования</h1>
-      <p>Выберите даты и время, посмотрите свободные комплекты и отправьте заявку на бронирование через интерфейс, подключённый к Google Sheets.</p>
-    </div>
 
-    <div class="layout">
+    <div id="bookingApp">
+      <div class="hero">
+        <div class="logo">ТЖК</div>
+        <h1>Лист бронирования</h1>
+        <p>Выберите даты и время, посмотрите свободные комплекты и отправьте заявку на бронирование через интерфейс, подключённый к Google Sheets.</p>
+      </div>
+
       <section class="card">
         <div class="cardInner">
           <h2 class="cardTitle">Оформление заявки</h2>
@@ -496,55 +507,54 @@
               <input class="input" id="event" type="text" placeholder="Съёмка / интервью / трансляция">
             </div>
 
-            <div class="field">
-              <div class="label">Дата выдачи</div>
-              <input class="input" id="startDate" type="date">
-            </div>
-
-            <div class="field">
-              <div class="label">Время выдачи</div>
-              <input class="input" id="startTime" type="time">
-            </div>
-
-            <div class="field">
-              <div class="label">Дата возврата</div>
-              <input class="input" id="endDate" type="date">
-            </div>
-
-            <div class="field">
-              <div class="label">Время возврата</div>
-              <input class="input" id="endTime" type="time">
-            </div>
-
-            <div class="field">
-              <div class="label">Нужна удочка / микрофон</div>
-              <select class="select" id="needBoom">
-                <option value="">— Выберите —</option>
-                <option value="Да">Да</option>
-                <option value="Нет">Нет</option>
-              </select>
+            <div class="field full">
+              <div class="timeCard">
+                <div class="timeCardTitle">Дата начала</div>
+                <div class="timeCardGrid">
+                  <div class="field">
+                    <div class="label">Дата начала</div>
+                    <input class="input" id="startDate" type="date">
+                  </div>
+                  <div class="field">
+                    <div class="label">Время начала</div>
+                    <input class="input" id="startTime" type="time">
+                  </div>
+                </div>
+                <div class="hint">Рабочие дни: Пн–Пт. Время выдачи: 10:30–17:10</div>
+              </div>
             </div>
 
             <div class="field full">
-              <div class="label">Комментарий</div>
-              <textarea class="textarea" id="comment" placeholder="Дополнительные условия, особенности съёмки, пожелания по комплекту..."></textarea>
+              <div class="timeCard">
+                <div class="timeCardTitle">Дата окончания</div>
+                <div class="timeCardGrid">
+                  <div class="field">
+                    <div class="label">Дата окончания</div>
+                    <input class="input" id="endDate" type="date">
+                  </div>
+                  <div class="field">
+                    <div class="label">Время окончания</div>
+                    <input class="input" id="endTime" type="time">
+                  </div>
+                </div>
+                <div class="hint">Шаг времени: 10 минут</div>
+              </div>
             </div>
           </div>
 
           <div class="actions">
-            <button class="btn btnPrimary" id="btnLoad" type="button">Показать свободные комплекты</button>
-            <button class="btn btnGhost" id="btnBook" type="button" disabled>Забронировать выбранный комплект</button>
+            <button class="btn btnPrimary" id="btnLoad" type="button">Показать доступные комплекты</button>
           </div>
 
           <div class="status info show" id="statusBox">
-            Сначала выберите даты и время, затем нажмите «Показать свободные комплекты».
+            Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».
           </div>
         </div>
       </section>
 
-      <aside class="card">
+      <section class="card">
         <div class="cardInner">
-          <h2 class="cardTitle">Свободные комплекты</h2>
+          <h2 class="cardTitle">Доступные комплекты</h2>
 
           <div class="meta">
             <div class="metaBox">
@@ -568,16 +578,330 @@
           <div class="kits" id="kitsList"></div>
           <div class="empty" id="emptyBox">Комплекты пока не загружены.</div>
         </div>
-      </aside>
+      </section>
+
+      <section class="card">
+        <div class="cardInner">
+          <div class="grid">
+            <div class="field">
+              <div class="label">Нужна ли удочка?</div>
+              <select class="select" id="needBoom">
+                <option value="">— Выберите —</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <div class="label">Комментарий</div>
+              <textarea class="textarea" id="comment" placeholder="Например: указания по съёмке, просьба по комплекту, особенности выдачи..."></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btnPrimary" id="btnBook" type="button" disabled>Забронировать выбранный комплект</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        Рабочий API подключён к Apps Script и Google Sheets.
+      </div>
     </div>
 
-    <div class="footer">
-      Рабочий API подключён к Apps Script и Google Sheets.
+    <div class="successScreen" id="successScreen">
+      <section class="card">
+        <div class="cardInner successBox">
+          <div class="successIcon">✓</div>
+          <h2 class="successTitle">Спасибо за бронирование</h2>
+          <p class="successText">
+            Ваша заявка успешно отправлена на рассмотрение.<br>
+            После проверки брони вы получите дальнейшую информацию.
+          </p>
+          <button class="btn btnPrimary" id="btnBackToForm" type="button">Вернуться к новому бронированию</button>
+        </div>
+      </section>
     </div>
+
   </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxXUO9796H2XIHvNJOG1fKU9mcjo5QMncsYk9p_VgM4yVYLRFyU83gORJBUBD2xao06mQ/exec";
+
+    const KIT_DESCRIPTIONS = {
+      "ТЖК-1": `СПИСОК КОМПЛЕКТА ТЖК-1
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 1
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-2": `СПИСОК КОМПЛЕКТА ТЖК-2
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 2
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-3": `СПИСОК КОМПЛЕКТА ТЖК-3
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 3
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-4": `СПИСОК КОМПЛЕКТА ТЖК-4
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 4
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-5": `СПИСОК КОМПЛЕКТА ТЖК-5
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 5
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-6": `СПИСОК КОМПЛЕКТА ТЖК-6
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера SONY ZV-E10 — 1 шт.
+Объектив SONY Kit 16-50mm f/3.5-5.6 — 1 шт.
+Крышка для объектива — 1 шт.
+Аккумулятор SONY NP-FW50 — 1 шт.
+Крышка горячего башмака с ветрозащитой — 1 шт.
+Зарядное устройство в комплекте — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Приемник DJI Mic 2 (RX) — 1 шт.
+Передатчик DJI Mic 2 (TX, черный) — 2 шт.
+Кабель для камеры (3.5mm TRS) — 1 шт.
+Адаптер для телефона (USB Type-C \\ Lightning) — 1 шт.
+Ветрозащита (для TX) — 2 шт.
+Магнитный зажим (для TX) — 2 шт.
+Зарядный кабель (USB-C раздвоенный) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+Наушники – 1 шт.
+
+СВЕТОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Накамерный свет Raylab RL-LED08RGB-2 — 1 шт.
+Силиконовый софтбокс — 1 шт.
+Кабель для зарядки — 1 шт.
+Холодный башмак — 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)
+
+СПИСОК КОМПЛЕКТАЦИИ ШТАТИВА ДЛЯ ТЖК № 6
+
+ШТАТИВ КОМПЛЕКТАЦИЯ:
+Штатив Falcon Eyes CinemaPRO VT-1695 – 1 шт.
+Видеоголова Falcon Eyes – 1 шт.
+Быстросъёмная площадка – 1 шт.
+Болт 1/4"" для площадки штатива – 1 шт.
+Сумка-чехол для хранения и переноски – 1 шт.`,
+
+      "ТЖК-7": `СПИСОК КОМПЛЕКТА ТЖК-7
+
+КАМЕРА КОМПЛЕКТАЦИЯ:
+Камера DJI Osmo Pocket 3 Creator Combo — 1 шт.
+Аккумуляторная ручка Osmo Pocket 3 — 1 шт.
+Аккумуляторная ручка Osmo Pocket 3 mini — 1 шт.
+Широкоугольный объектив Osmo Pocket 3 — 1 шт.
+Мини-штатив Osmo — 1 шт.
+Защитный чехол — 1 шт.
+Ремешок DJI на запястье — 1 шт.
+Ручка Osmo Pocket 3 с резьбой 1/4″ — 1 шт.
+Кабель PD Type-C to Type-C — 1 шт.
+
+ЗВУКОВОЕ ОБОРУДОВАНИЕ КОМПЛЕКТАЦИЯ:
+Передатчик DJI Mic 2 (TX, черный) — 1 шт.
+Ветрозащита (для TX) — 1 шт.
+Магнитный зажим (для TX) — 1 шт.
+Держатель для микрофона с ветрозащитой – 1 шт.
+
+ДОПОЛНИТЕЛЬНО:
+Кубик ИПАМ (опционально)
+SD карточка 32\\64гб (опционально)
+ТЖК удочка\\ микрофон пушка (опционально)`
+    };
+
+    const bookingApp = document.getElementById("bookingApp");
+    const successScreen = document.getElementById("successScreen");
 
     const fioEl = document.getElementById("fio");
     const emailEl = document.getElementById("email");
@@ -594,6 +918,7 @@
 
     const btnLoad = document.getElementById("btnLoad");
     const btnBook = document.getElementById("btnBook");
+    const btnBackToForm = document.getElementById("btnBackToForm");
 
     const statusBox = document.getElementById("statusBox");
     const kitsList = document.getElementById("kitsList");
@@ -603,7 +928,6 @@
     const apiBadge = document.getElementById("apiBadge");
 
     let selectedKit = "";
-    const descriptionCache = new Map();
 
     function setStatus(type, text){
       statusBox.className = "status show " + type;
@@ -623,22 +947,10 @@
       return String(num).padStart(2, "0");
     }
 
-    function formatDateHuman(dateStr){
-      if (!dateStr) return "";
-      const [y,m,d] = dateStr.split("-");
-      return `${d}.${m}.${y}`;
-    }
-
     function formatApiDate(dateStr, timeStr){
       if (!dateStr || !timeStr) return "";
       const [y,m,d] = dateStr.split("-");
       return `${d}.${m}.${y} ${timeStr}`;
-    }
-
-    function getPeriod(){
-      const start = formatApiDate(startDateEl.value, startTimeEl.value);
-      const end = formatApiDate(endDateEl.value, endTimeEl.value);
-      return { start, end };
     }
 
     function getDateTimeValue(dateStr, timeStr){
@@ -664,7 +976,6 @@
       selectedKitName.textContent = "—";
       btnBook.disabled = true;
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
-      document.querySelectorAll('input[name="kit"]').forEach(el => { el.checked = false; });
     }
 
     function setTodayMin(){
@@ -675,8 +986,8 @@
     }
 
     function applyDefaultTimes(){
-      if (!startTimeEl.value) startTimeEl.value = "10:00";
-      if (!endTimeEl.value) endTimeEl.value = "18:00";
+      if (!startTimeEl.value) startTimeEl.value = "12:30";
+      if (!endTimeEl.value) endTimeEl.value = "12:30";
     }
 
     function syncDateConstraints(){
@@ -697,25 +1008,6 @@
       return await res.json();
     }
 
-    async function apiGetKitDescription(kit){
-      if (descriptionCache.has(kit)) {
-        return { ok: true, description: descriptionCache.get(kit) };
-      }
-
-      const url = new URL(API_URL);
-      url.searchParams.set("action", "getKitDescription");
-      url.searchParams.set("kit", kit);
-
-      const res = await fetch(url.toString(), { method: "GET" });
-      if (!res.ok) throw new Error("Ошибка сети при получении комплектации");
-
-      const data = await res.json();
-      if (data && data.ok) {
-        descriptionCache.set(kit, data.description || "Комплектация не указана.");
-      }
-      return data;
-    }
-
     async function apiCreateBooking(payload){
       const url = new URL(API_URL);
       url.searchParams.set("action", "createBooking");
@@ -734,13 +1026,12 @@
       return await res.json();
     }
 
-    function selectKit(kitName, card, radio){
-      const sameKitClicked = selectedKit === kitName;
+    function selectKit(kitName, card){
+      const isSame = selectedKit === kitName;
 
       document.querySelectorAll(".kit").forEach(el => el.classList.remove("selected"));
-      document.querySelectorAll('input[name="kit"]').forEach(el => { el.checked = false; });
 
-      if (sameKitClicked) {
+      if (isSame) {
         selectedKit = "";
         selectedKitName.textContent = "—";
         btnBook.disabled = true;
@@ -750,7 +1041,6 @@
       selectedKit = kitName;
       selectedKitName.textContent = kitName;
       card.classList.add("selected");
-      radio.checked = true;
       btnBook.disabled = false;
     }
 
@@ -767,115 +1057,97 @@
       emptyBox.style.display = "none";
 
       kits.forEach((kitName) => {
+        const desc = KIT_DESCRIPTIONS[kitName] || "Комплектация для этого комплекта пока не заполнена.";
+
         const card = document.createElement("div");
         card.className = "kit";
         card.dataset.kit = kitName;
 
         card.innerHTML = `
-          <div class="kitHead">
-            <div class="kitName">${escapeHtml(kitName)}</div>
-          </div>
+          <div class="kitName">${escapeHtml(kitName)}</div>
 
           <div class="kitActions">
-            <button type="button" class="btnSmall js-desc-btn">Показать комплектацию</button>
+            <button type="button" class="btnSmall js-desc-btn">Посмотреть комплектацию</button>
+            <button type="button" class="btnSmall js-pick-btn">Выбрать этот комплект</button>
           </div>
 
-          <div class="kitDesc"></div>
+          <div class="kitDesc">${escapeHtml(desc)}</div>
 
-          <label class="kitPick">
-            <input type="radio" name="kit" value="${escapeHtml(kitName)}" />
-            <span>Выбрать этот комплект</span>
-          </label>
+          <div class="kitHint">Можно открыть комплектацию, затем выбрать комплект.</div>
         `;
 
-        const radio = card.querySelector("input[type='radio']");
         const descBtn = card.querySelector(".js-desc-btn");
+        const pickBtn = card.querySelector(".js-pick-btn");
         const descBox = card.querySelector(".kitDesc");
-        const pickLabel = card.querySelector(".kitPick");
 
-        const handleSelect = (e) => {
-          if (e) e.stopPropagation();
-          selectKit(kitName, card, radio);
-        };
-
-        radio.addEventListener("click", (e) => {
-          e.preventDefault();
-          handleSelect(e);
+        descBtn.addEventListener("click", () => {
+          const opened = descBox.classList.contains("show");
+          descBox.classList.toggle("show");
+          descBtn.textContent = opened ? "Посмотреть комплектацию" : "Скрыть комплектацию";
         });
 
-        pickLabel.addEventListener("click", handleSelect);
-
-        card.addEventListener("click", (e) => {
-          if (
-            e.target.closest(".js-desc-btn") ||
-            e.target.closest(".kitDesc") ||
-            e.target.closest("input")
-          ) return;
-          handleSelect(e);
-        });
-
-        descBtn.addEventListener("click", async (e) => {
-          e.stopPropagation();
-
-          if (descBox.classList.contains("show")) {
-            descBox.classList.remove("show");
-            descBtn.textContent = "Показать комплектацию";
-            return;
-          }
-
-          try {
-            descBtn.disabled = true;
-            descBtn.textContent = "Загрузка...";
-
-            const result = await apiGetKitDescription(kitName);
-            const text = result && result.ok
-              ? (result.description || "Комплектация не указана.")
-              : (result.message || "Не удалось загрузить комплектацию.");
-
-            descBox.textContent = text;
-            descBox.classList.add("show");
-            descBtn.textContent = "Скрыть комплектацию";
-          } catch (e2) {
-            descBox.textContent = e2.message || "Ошибка загрузки комплектации.";
-            descBox.classList.add("show");
-            descBtn.textContent = "Скрыть комплектацию";
-          } finally {
-            descBtn.disabled = false;
-          }
+        pickBtn.addEventListener("click", () => {
+          selectKit(kitName, card);
         });
 
         kitsList.appendChild(card);
       });
     }
 
-    function validateBeforeLoad(){
+    function clearAfterSuccess(){
+      fioEl.value = "";
+      emailEl.value = "";
+      phoneEl.value = "";
+      eventEl.value = "";
+      startDateEl.value = "";
+      startTimeEl.value = "12:30";
+      endDateEl.value = "";
+      endTimeEl.value = "12:30";
+      needBoomEl.value = "";
+      commentEl.value = "";
+      kitsList.innerHTML = "";
+      emptyBox.style.display = "block";
+      emptyBox.textContent = "Комплекты пока не загружены.";
+      resetSelection();
       updatePeriodBox();
+      syncDateConstraints();
+      setStatus("info", "Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».");
+    }
 
-      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
-        setStatus("error", "Заполните дату и время начала и окончания.");
-        return false;
-      }
+    function showSuccessScreen(){
+      bookingApp.style.display = "none";
+      successScreen.classList.add("show");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-      if (!isPeriodValid()) {
-        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
-        return false;
-      }
-
-      return true;
+    function showBookingScreen(){
+      successScreen.classList.remove("show");
+      bookingApp.style.display = "";
+      clearAfterSuccess();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     btnLoad.addEventListener("click", async () => {
       resetSelection();
       updatePeriodBox();
 
-      if (!validateBeforeLoad()) return;
+      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
+        setStatus("error", "Заполните дату и время начала и окончания.");
+        return;
+      }
 
-      const { start, end } = getPeriod();
+      if (!isPeriodValid()) {
+        setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        return;
+      }
+
+      const start = formatApiDate(startDateEl.value, startTimeEl.value);
+      const end = formatApiDate(endDateEl.value, endTimeEl.value);
 
       try {
         btnLoad.disabled = true;
         btnLoad.textContent = "Загрузка...";
-        setStatus("info", "Загружаем свободные комплекты...");
+        setStatus("info", "Загружаем доступные комплекты...");
 
         const result = await apiGetKits(start, end);
 
@@ -888,23 +1160,20 @@
         renderKits(result.kits || []);
 
         if ((result.kits || []).length) {
-          setStatus("success", "Свободные комплекты найдены. Можно посмотреть комплектацию и выбрать нужный комплект.");
+          setStatus("success", "Комплекты загружены. Комплектация раскрывается мгновенно.");
         } else {
           setStatus("info", "На выбранный период свободных комплектов нет.");
         }
-
       } catch (err) {
         renderKits([]);
         setStatus("error", err.message || "Ошибка при загрузке комплектов.");
       } finally {
         btnLoad.disabled = false;
-        btnLoad.textContent = "Показать свободные комплекты";
+        btnLoad.textContent = "Показать доступные комплекты";
       }
     });
 
     btnBook.addEventListener("click", async () => {
-      updatePeriodBox();
-
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
@@ -945,12 +1214,14 @@
         const result = await apiCreateBooking(payload);
 
         if (result.status === "success") {
-          setStatus("success", "Заявка создана. Бронь отправлена на рассмотрение.");
+          showSuccessScreen();
           return;
         }
 
         if (result.status === "occupied") {
           setStatus("error", "Пока вы оформляли заявку, комплект уже заняли. Обновите список.");
+          btnBook.disabled = false;
+          btnBook.textContent = "Забронировать выбранный комплект";
           return;
         }
 
@@ -958,10 +1229,13 @@
       } catch (err) {
         setStatus("error", err.message || "Ошибка при создании брони.");
       } finally {
+        if (successScreen.classList.contains("show")) return;
         btnBook.disabled = !selectedKit;
         btnBook.textContent = "Забронировать выбранный комплект";
       }
     });
+
+    btnBackToForm.addEventListener("click", showBookingScreen);
 
     [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
       el.addEventListener("change", () => {
@@ -970,7 +1244,7 @@
         resetSelection();
         kitsList.innerHTML = "";
         emptyBox.style.display = "block";
-        emptyBox.textContent = "После изменения периода нажмите «Показать свободные комплекты» заново.";
+        emptyBox.textContent = "После изменения периода нажмите «Показать доступные комплекты» заново.";
       });
     });
 
