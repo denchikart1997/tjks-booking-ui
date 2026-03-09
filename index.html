@@ -18,6 +18,7 @@
       --brand:#22c55e;
       --brand2:#3b82f6;
       --danger:#ef4444;
+      --dangerBg:rgba(239,68,68,.09);
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --radius:24px;
       --ease:cubic-bezier(.22,1,.36,1);
@@ -37,6 +38,7 @@
       color:var(--text);
       background:#050A14;
       overscroll-behavior-y:none;
+      scroll-behavior:smooth;
     }
 
     body{
@@ -50,11 +52,13 @@
       inset:0;
       z-index:-2;
       background:
-        radial-gradient(circle at 15% 15%, rgba(59,130,246,.18), transparent 24%),
-        radial-gradient(circle at 85% 15%, rgba(34,197,94,.12), transparent 22%),
-        radial-gradient(circle at 50% 100%, rgba(59,130,246,.08), transparent 28%),
-        linear-gradient(180deg, var(--bg1), var(--bg0));
+        radial-gradient(circle at 12% 14%, rgba(59,130,246,.22), transparent 26%),
+        radial-gradient(circle at 84% 16%, rgba(34,197,94,.14), transparent 24%),
+        radial-gradient(circle at 52% 100%, rgba(59,130,246,.10), transparent 30%),
+        linear-gradient(180deg, #0E1738 0%, #081224 45%, #050A14 100%);
       background-color:#050A14;
+      will-change:transform;
+      transform:translateZ(0);
     }
 
     body::after{
@@ -182,6 +186,27 @@
     .textarea{
       min-height:116px;
       resize:vertical;
+    }
+
+    .input.errorField,
+    .select.errorField,
+    .textarea.errorField,
+    .fakeDateBox.errorField{
+      border-color:rgba(239,68,68,.92) !important;
+      background:var(--dangerBg) !important;
+      box-shadow:0 0 0 3px rgba(239,68,68,.10) !important;
+    }
+
+    .fieldError{
+      display:none;
+      font-size:12px;
+      line-height:1.35;
+      color:#ffb4b4;
+      margin-top:-2px;
+    }
+
+    .fieldError.show{
+      display:block;
     }
 
     .timeCard{
@@ -622,31 +647,35 @@
           <h2 class="cardTitle">Оформление заявки</h2>
 
           <div class="grid">
-            <div class="field">
+            <div class="field" id="fioField">
               <div class="label">ФИО</div>
               <input class="input" id="fio" type="text" placeholder="Иванов Иван Иванович" autocomplete="name">
+              <div class="fieldError" id="fioError">Заполните поле ФИО.</div>
             </div>
 
-            <div class="field">
+            <div class="field" id="emailField">
               <div class="label">Email</div>
               <input class="input" id="email" type="email" placeholder="name@mail.ru" autocomplete="email">
+              <div class="fieldError" id="emailError">Заполните поле Email.</div>
             </div>
 
-            <div class="field">
+            <div class="field" id="phoneField">
               <div class="label">Телефон</div>
-              <input class="input" id="phone" type="tel" placeholder="+7 900 000-00-00" autocomplete="tel">
+              <input class="input" id="phone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel">
+              <div class="fieldError" id="phoneError">Введите телефон в формате +7 900 000-00-00.</div>
             </div>
 
-            <div class="field">
+            <div class="field" id="eventField">
               <div class="label">Мероприятие</div>
               <input class="input" id="event" type="text" placeholder="Съёмка / интервью / трансляция">
+              <div class="fieldError" id="eventError">Заполните поле Мероприятие.</div>
             </div>
 
             <div class="field full">
               <div class="timeCard">
                 <div class="timeCardTitle">Начало</div>
                 <div class="timeCardGrid">
-                  <div class="field">
+                  <div class="field" id="startDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
                       <div class="fakeDateBox" id="startDateBox">
@@ -654,10 +683,12 @@
                         <input class="realDateInput" id="startDate" type="date">
                       </div>
                     </div>
+                    <div class="fieldError" id="startDateError">Укажите дату начала.</div>
                   </div>
-                  <div class="field">
+                  <div class="field" id="startTimeField">
                     <div class="label">Время</div>
                     <input class="input" id="startTime" type="time">
+                    <div class="fieldError" id="startTimeError">Укажите время начала.</div>
                   </div>
                 </div>
                 <div class="hint">Рабочие дни: Пн–Пт. Время выдачи: 10:30–17:10</div>
@@ -668,7 +699,7 @@
               <div class="timeCard">
                 <div class="timeCardTitle">Окончание</div>
                 <div class="timeCardGrid">
-                  <div class="field">
+                  <div class="field" id="endDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
                       <div class="fakeDateBox" id="endDateBox">
@@ -676,10 +707,12 @@
                         <input class="realDateInput" id="endDate" type="date">
                       </div>
                     </div>
+                    <div class="fieldError" id="endDateError">Укажите дату окончания.</div>
                   </div>
-                  <div class="field">
+                  <div class="field" id="endTimeField">
                     <div class="label">Время</div>
                     <input class="input" id="endTime" type="time">
+                    <div class="fieldError" id="endTimeError">Укажите время окончания.</div>
                   </div>
                 </div>
                 <div class="hint">Шаг времени: 10 минут</div>
@@ -1067,6 +1100,17 @@ SD карточка 32\\64гб (опционально)
     const apiDot = document.getElementById("apiDot");
     const apiText = document.getElementById("apiText");
 
+    const fieldMap = {
+      fio: { input: fioEl, error: document.getElementById("fioError"), wrapper: document.getElementById("fioField") },
+      email: { input: emailEl, error: document.getElementById("emailError"), wrapper: document.getElementById("emailField") },
+      phone: { input: phoneEl, error: document.getElementById("phoneError"), wrapper: document.getElementById("phoneField") },
+      event: { input: eventEl, error: document.getElementById("eventError"), wrapper: document.getElementById("eventField") },
+      startDate: { input: startDateEl, error: document.getElementById("startDateError"), wrapper: document.getElementById("startDateField"), visual: startDateBox },
+      startTime: { input: startTimeEl, error: document.getElementById("startTimeError"), wrapper: document.getElementById("startTimeField") },
+      endDate: { input: endDateEl, error: document.getElementById("endDateError"), wrapper: document.getElementById("endDateField"), visual: endDateBox },
+      endTime: { input: endTimeEl, error: document.getElementById("endTimeError"), wrapper: document.getElementById("endTimeField") }
+    };
+
     let selectedKit = "";
 
     function setStatus(type, text){
@@ -1156,38 +1200,137 @@ SD карточка 32\\64гб (опционально)
       }, 160);
     }
 
+    function clearFieldErrors(){
+      Object.values(fieldMap).forEach(({ input, error, visual }) => {
+        if (input) input.classList.remove("errorField");
+        if (visual) visual.classList.remove("errorField");
+        if (error) error.classList.remove("show");
+      });
+    }
+
+    function showFieldError(key, message){
+      const item = fieldMap[key];
+      if (!item) return;
+
+      if (item.input) item.input.classList.add("errorField");
+      if (item.visual) item.visual.classList.add("errorField");
+      if (item.error) {
+        item.error.textContent = message;
+        item.error.classList.add("show");
+      }
+    }
+
+    function focusField(key){
+      const item = fieldMap[key];
+      if (!item) return;
+
+      const target = item.wrapper || item.input || item.visual;
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      setTimeout(() => {
+        if (item.input) item.input.focus({ preventScroll: true });
+      }, 220);
+    }
+
+    function validateEmail(value){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function validatePhone(value){
+      return /^\+7 \d{3} \d{3}-\d{2}-\d{2}$/.test(value);
+    }
+
     function validateBookingFields(){
-      if (!fioEl.value.trim()) {
+      clearFieldErrors();
+
+      const fio = fioEl.value.trim();
+      const email = emailEl.value.trim();
+      const phone = phoneEl.value.trim();
+      const eventName = eventEl.value.trim();
+
+      if (!fio) {
+        showFieldError("fio", "Заполните поле ФИО.");
+        focusField("fio");
         setStatus("error", "Заполните поле ФИО.");
         return false;
       }
 
-      if (!emailEl.value.trim()) {
+      if (!email) {
+        showFieldError("email", "Заполните поле Email.");
+        focusField("email");
         setStatus("error", "Заполните поле Email.");
         return false;
       }
 
-      if (!phoneEl.value.trim()) {
+      if (!validateEmail(email)) {
+        showFieldError("email", "Введите корректный Email.");
+        focusField("email");
+        setStatus("error", "Введите корректный Email.");
+        return false;
+      }
+
+      if (!phone) {
+        showFieldError("phone", "Заполните поле Телефон.");
+        focusField("phone");
         setStatus("error", "Заполните поле Телефон.");
         return false;
       }
 
-      if (!eventEl.value.trim()) {
+      if (!validatePhone(phone)) {
+        showFieldError("phone", "Введите телефон в формате +7 900 000-00-00.");
+        focusField("phone");
+        setStatus("error", "Введите телефон в формате +7 900 000-00-00.");
+        return false;
+      }
+
+      if (!eventName) {
+        showFieldError("event", "Заполните поле Мероприятие.");
+        focusField("event");
         setStatus("error", "Заполните поле Мероприятие.");
         return false;
       }
 
-      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
-        setStatus("error", "Заполните дату и время начала и окончания.");
+      if (!startDateEl.value) {
+        showFieldError("startDate", "Укажите дату начала.");
+        focusField("startDate");
+        setStatus("error", "Укажите дату начала.");
+        return false;
+      }
+
+      if (!startTimeEl.value) {
+        showFieldError("startTime", "Укажите время начала.");
+        focusField("startTime");
+        setStatus("error", "Укажите время начала.");
+        return false;
+      }
+
+      if (!endDateEl.value) {
+        showFieldError("endDate", "Укажите дату окончания.");
+        focusField("endDate");
+        setStatus("error", "Укажите дату окончания.");
+        return false;
+      }
+
+      if (!endTimeEl.value) {
+        showFieldError("endTime", "Укажите время окончания.");
+        focusField("endTime");
+        setStatus("error", "Укажите время окончания.");
         return false;
       }
 
       if (!isPeriodValid()) {
+        showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        focusField("endDate");
         setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
         return false;
       }
 
       if (!selectedKit) {
+        showKitsSection();
+        selectedKitName.scrollIntoView({ behavior: "smooth", block: "center" });
         setStatus("error", "Сначала выберите комплект.");
         return false;
       }
@@ -1227,6 +1370,28 @@ SD карточка 32\\64гб (опционально)
         endDateEl.min = startDateEl.value;
         if (!endDateEl.value) endDateEl.value = startDateEl.value;
       }
+    }
+
+    function formatPhoneInput(value){
+      const digits = value.replace(/\D/g, "");
+
+      let normalized = digits;
+      if (normalized.startsWith("8")) normalized = "7" + normalized.slice(1);
+      if (!normalized.startsWith("7")) normalized = "7" + normalized;
+      normalized = normalized.slice(0, 11);
+
+      let result = "+7";
+      const p1 = normalized.slice(1, 4);
+      const p2 = normalized.slice(4, 7);
+      const p3 = normalized.slice(7, 9);
+      const p4 = normalized.slice(9, 11);
+
+      if (p1) result += " " + p1;
+      if (p2) result += " " + p2;
+      if (p3) result += "-" + p3;
+      if (p4) result += "-" + p4;
+
+      return result;
     }
 
     async function apiGetKits(start, end){
@@ -1362,6 +1527,7 @@ SD карточка 32\\64гб (опционально)
       resetSelection();
       syncDateConstraints();
       updateDateDisplays();
+      clearFieldErrors();
       setStatus("info", "Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».");
     }
 
@@ -1379,15 +1545,42 @@ SD карточка 32\\64гб (опционально)
     }
 
     btnLoad.addEventListener("click", async () => {
+      clearFieldErrors();
       resetSelection();
       hideKitsSection();
 
-      if (!startDateEl.value || !startTimeEl.value || !endDateEl.value || !endTimeEl.value) {
-        setStatus("error", "Заполните дату и время начала и окончания.");
+      if (!startDateEl.value) {
+        showFieldError("startDate", "Укажите дату начала.");
+        focusField("startDate");
+        setStatus("error", "Укажите дату начала.");
+        return;
+      }
+
+      if (!startTimeEl.value) {
+        showFieldError("startTime", "Укажите время начала.");
+        focusField("startTime");
+        setStatus("error", "Укажите время начала.");
+        return;
+      }
+
+      if (!endDateEl.value) {
+        showFieldError("endDate", "Укажите дату окончания.");
+        focusField("endDate");
+        setStatus("error", "Укажите дату окончания.");
+        return;
+      }
+
+      if (!endTimeEl.value) {
+        showFieldError("endTime", "Укажите время окончания.");
+        focusField("endTime");
+        setStatus("error", "Укажите время окончания.");
         return;
       }
 
       if (!isPeriodValid()) {
+        showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
+        focusField("endDate");
         setStatus("error", "Дата и время возврата должны быть позже даты и времени выдачи.");
         return;
       }
@@ -1473,6 +1666,24 @@ SD карточка 32\\64гб (опционально)
 
     btnBackToForm.addEventListener("click", showBookingScreen);
 
+    [fioEl, emailEl, eventEl, startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
+      el.addEventListener("input", clearFieldErrors);
+      el.addEventListener("change", clearFieldErrors);
+    });
+
+    phoneEl.addEventListener("input", () => {
+      phoneEl.value = formatPhoneInput(phoneEl.value);
+      clearFieldErrors();
+    });
+
+    phoneEl.addEventListener("focus", () => {
+      if (!phoneEl.value.trim()) phoneEl.value = "+7 ";
+    });
+
+    phoneEl.addEventListener("blur", () => {
+      if (phoneEl.value.trim() === "+7") phoneEl.value = "";
+    });
+
     [startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
       el.addEventListener("change", () => {
         syncDateConstraints();
@@ -1495,6 +1706,7 @@ SD карточка 32\\64гб (опционально)
       updateDateDisplays();
       hideKitsSection();
       hideExtrasSection();
+      clearFieldErrors();
 
       try {
         const url = new URL(API_URL);
