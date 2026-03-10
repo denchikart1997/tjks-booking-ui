@@ -667,6 +667,12 @@
       font-size:15px;
     }
 
+    .successEmail{
+      color:#ffffff;
+      font-weight:800;
+      word-break:break-word;
+    }
+
     .footer{
       margin-top:14px;
       text-align:center;
@@ -788,19 +794,19 @@
             </div>
 
             <div class="field" id="eventField">
-              <div class="label">Мероприятие</div>
+              <div class="label">Название мероприятия</div>
               <input class="input" id="event" type="text" placeholder="Съёмка / интервью / трансляция">
-              <div class="fieldError" id="eventError">Заполните поле Мероприятие.</div>
+              <div class="fieldError" id="eventError">Заполните поле Название мероприятия.</div>
             </div>
 
             <div class="field full">
               <div class="timeCard">
-                <div class="timeCardTitle">Начало</div>
+                <div class="timeCardTitle">Начало бронирования</div>
                 <div class="timeCardGrid">
                   <div class="field" id="startDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
-                      <div class="fakeDateBox" id="startDateBox">
+                      <div class="fakeDateBox" id="startDateBox" tabindex="0">
                         <span class="fakeDateValue" id="startDateDisplay">дд.мм.гг</span>
                         <input class="realDateInput" id="startDate" type="date">
                       </div>
@@ -816,18 +822,18 @@
                     <div class="fieldError" id="startTimeError">Укажите время начала.</div>
                   </div>
                 </div>
-                <div class="hint">Рабочие дни: Пн–Пт. Время выдачи: 10:30–17:10</div>
+                <div class="hint">Рабочие дни: Пн–Пт. Время выдачи и возврата: 10:30–17:10</div>
               </div>
             </div>
 
             <div class="field full">
               <div class="timeCard">
-                <div class="timeCardTitle">Окончание</div>
+                <div class="timeCardTitle">Окончание бронирования</div>
                 <div class="timeCardGrid">
                   <div class="field" id="endDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
-                      <div class="fakeDateBox" id="endDateBox">
+                      <div class="fakeDateBox" id="endDateBox" tabindex="0">
                         <span class="fakeDateValue" id="endDateDisplay">дд.мм.гг</span>
                         <input class="realDateInput" id="endDate" type="date">
                       </div>
@@ -843,7 +849,7 @@
                     <div class="fieldError" id="endTimeError">Укажите время окончания.</div>
                   </div>
                 </div>
-                <div class="hint">Шаг времени: 10 минут</div>
+                <div class="hint">Выдача и возврат: только Пн–Пт, 10:30–17:10. Шаг времени: 10 минут</div>
               </div>
             </div>
           </div>
@@ -911,7 +917,7 @@
           <h2 class="successTitle">Спасибо за бронирование</h2>
           <p class="successText">
             Ожидайте рассмотрения заявки.<br>
-            По результату на вашу почту придёт письмо с подтверждением.
+            По результату на указанную вами почту <span class="successEmail" id="successEmail">—</span> придёт письмо.
           </p>
           <button class="btn btnPrimary" id="btnBackToForm" type="button">Вернуться к новому бронированию</button>
         </div>
@@ -922,6 +928,9 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxXUO9796H2XIHvNJOG1fKU9mcjo5QMncsYk9p_VgM4yVYLRFyU83gORJBUBD2xao06mQ/exec";
+    const WORK_RULES_MESSAGE = "Выдача и возврат в выходные дни запрещены! Рабочие дни: Пн–Пт. Время: 10:30–17:10";
+    const WORK_START = "10:30";
+    const WORK_END = "17:10";
 
     const KIT_DESCRIPTIONS = {
       "ТЖК-1": `СПИСОК КОМПЛЕКТА ТЖК-1
@@ -1231,6 +1240,7 @@ SD карточка 32\\64гб (опционально)
     const selectedKitName = document.getElementById("selectedKitName");
     const apiDot = document.getElementById("apiDot");
     const apiText = document.getElementById("apiText");
+    const successEmailEl = document.getElementById("successEmail");
 
     const fieldMap = {
       fio: { input: fioEl, error: document.getElementById("fioError"), wrapper: document.getElementById("fioField") },
@@ -1244,6 +1254,7 @@ SD карточка 32\\64гб (опционально)
     };
 
     let selectedKit = "";
+    let lastBookedEmail = "";
 
     function setStatus(type, text){
       statusBox.className = "status show " + type;
@@ -1283,11 +1294,40 @@ SD карточка 32\\64гб (опционально)
       endDateDisplay.classList.toggle("filled", !!endDateEl.value);
     }
 
+    function openDatePicker(input){
+      if (!input) return;
+
+      input.focus({ preventScroll: true });
+
+      try {
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+          return;
+        }
+      } catch (e) {}
+
+      try {
+        input.click();
+      } catch (e) {}
+    }
+
     function attachFakeDateFocus(input, box){
       input.addEventListener("focus", () => box.classList.add("focused"));
       input.addEventListener("blur", () => box.classList.remove("focused"));
       input.addEventListener("change", updateDateDisplays);
       input.addEventListener("input", updateDateDisplays);
+
+      box.addEventListener("click", (e) => {
+        if (e.target === input) return;
+        openDatePicker(input);
+      });
+
+      box.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openDatePicker(input);
+        }
+      });
     }
 
     function attachWrapFocus(input, wrap){
@@ -1305,6 +1345,52 @@ SD карточка 32\\64гб (опционально)
       const endDt = getDateTimeValue(endDateEl.value, endTimeEl.value);
       if (!startDt || !endDt) return false;
       return endDt > startDt;
+    }
+
+    function timeToMinutes(timeStr){
+      if (!timeStr || !/^\d{2}:\d{2}$/.test(timeStr)) return null;
+      const [h, m] = timeStr.split(":").map(Number);
+      return (h * 60) + m;
+    }
+
+    function isWeekday(dateStr){
+      if (!dateStr) return false;
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const day = new Date(y, m - 1, d).getDay();
+      return day >= 1 && day <= 5;
+    }
+
+    function isAllowedTime(timeStr){
+      const value = timeToMinutes(timeStr);
+      const min = timeToMinutes(WORK_START);
+      const max = timeToMinutes(WORK_END);
+      if (value === null || min === null || max === null) return false;
+      return value >= min && value <= max;
+    }
+
+    function validateWorkingRules(){
+      const startDateValid = isWeekday(startDateEl.value);
+      const endDateValid = isWeekday(endDateEl.value);
+      const startTimeValid = isAllowedTime(startTimeEl.value);
+      const endTimeValid = isAllowedTime(endTimeEl.value);
+
+      if (startDateValid && endDateValid && startTimeValid && endTimeValid) {
+        return true;
+      }
+
+      if (!startDateValid) showFieldError("startDate", WORK_RULES_MESSAGE);
+      if (!endDateValid) showFieldError("endDate", WORK_RULES_MESSAGE);
+      if (!startTimeValid) showFieldError("startTime", WORK_RULES_MESSAGE);
+      if (!endTimeValid) showFieldError("endTime", WORK_RULES_MESSAGE);
+
+      if (!startDateValid || !startTimeValid) {
+        focusField(!startDateValid ? "startDate" : "startTime");
+      } else {
+        focusField(!endDateValid ? "endDate" : "endTime");
+      }
+
+      setStatus("error", WORK_RULES_MESSAGE);
+      return false;
     }
 
     function setButtonLoading(button, isLoading){
@@ -1422,9 +1508,9 @@ SD карточка 32\\64гб (опционально)
       }
 
       if (!eventName) {
-        showFieldError("event", "Заполните поле Мероприятие.");
+        showFieldError("event", "Заполните поле Название мероприятия.");
         focusField("event");
-        setStatus("error", "Заполните поле Мероприятие.");
+        setStatus("error", "Заполните поле Название мероприятия.");
         return false;
       }
 
@@ -1456,6 +1542,10 @@ SD карточка 32\\64гб (опционально)
         return false;
       }
 
+      if (!validateWorkingRules()) {
+        return false;
+      }
+
       if (!isPeriodValid()) {
         showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
         showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
@@ -1474,6 +1564,19 @@ SD карточка 32\\64гб (опционально)
       return true;
     }
 
+    function closeAllDescriptionsExcept(kitName){
+      document.querySelectorAll(".kit").forEach(card => {
+        const currentKit = card.dataset.kit || "";
+        const desc = card.querySelector(".kitDesc");
+        const descBtn = card.querySelector(".js-desc-btn");
+
+        if (currentKit !== kitName) {
+          if (desc) desc.classList.remove("show");
+          if (descBtn) descBtn.textContent = "Посмотреть комплектацию";
+        }
+      });
+    }
+
     function resetSelection(){
       selectedKit = "";
       selectedKitName.textContent = "—";
@@ -1484,14 +1587,6 @@ SD карточка 32\\64гб (опционально)
         btn.classList.remove("loading");
         btn.textContent = "Выбрать этот комплект";
         btn.disabled = false;
-      });
-
-      document.querySelectorAll(".kitDesc").forEach(desc => {
-        desc.classList.remove("show");
-      });
-
-      document.querySelectorAll(".js-desc-btn").forEach(btn => {
-        btn.textContent = "Посмотреть комплектацию";
       });
 
       hideExtrasSection();
@@ -1507,6 +1602,15 @@ SD карточка 32\\64гб (опционально)
     function applyDefaultTimes(){
       if (!startTimeEl.value) startTimeEl.value = "12:30";
       if (!endTimeEl.value) endTimeEl.value = "12:30";
+    }
+
+    function applyTimeConstraints(){
+      startTimeEl.min = WORK_START;
+      startTimeEl.max = WORK_END;
+      endTimeEl.min = WORK_START;
+      endTimeEl.max = WORK_END;
+      startTimeEl.step = 600;
+      endTimeEl.step = 600;
     }
 
     function syncDateConstraints(){
@@ -1628,14 +1732,6 @@ SD карточка 32\\64гб (опционально)
         btn.disabled = false;
       });
 
-      document.querySelectorAll(".kitDesc").forEach(desc => {
-        desc.classList.remove("show");
-      });
-
-      document.querySelectorAll(".js-desc-btn").forEach(btn => {
-        btn.textContent = "Посмотреть комплектацию";
-      });
-
       if (isSame) {
         selectedKit = "";
         selectedKitName.textContent = "—";
@@ -1649,11 +1745,17 @@ SD карточка 32\\64гб (опционально)
       pickBtn.classList.add("selectedBtn");
       pickBtn.textContent = "Комплект выбран";
 
+      closeAllDescriptionsExcept(kitName);
+
       const currentDesc = card.querySelector(".kitDesc");
       const currentDescBtn = card.querySelector(".js-desc-btn");
 
-      if (currentDesc) currentDesc.classList.add("show");
-      if (currentDescBtn) currentDescBtn.textContent = "Скрыть комплектацию";
+      if (currentDesc && !currentDesc.classList.contains("show")) {
+        currentDesc.classList.add("show");
+      }
+      if (currentDescBtn && currentDesc && currentDesc.classList.contains("show")) {
+        currentDescBtn.textContent = "Скрыть комплектацию";
+      }
 
       showExtrasSection();
       btnBook.disabled = false;
@@ -1700,16 +1802,21 @@ SD карточка 32\\64гб (опционально)
           e.preventDefault();
 
           const opened = descBox.classList.contains("show");
+          const isSelectedCard = selectedKit === kitName;
 
-          if (!opened) {
-            document.querySelectorAll(".kitDesc").forEach(desc => desc.classList.remove("show"));
-            document.querySelectorAll(".js-desc-btn").forEach(btn => btn.textContent = "Посмотреть комплектацию");
-            descBox.classList.add("show");
-            descBtn.textContent = "Скрыть комплектацию";
-          } else {
+          if (opened) {
             descBox.classList.remove("show");
             descBtn.textContent = "Посмотреть комплектацию";
+            return;
           }
+
+          if (selectedKit && !isSelectedCard) {
+            closeAllDescriptionsExcept(selectedKit);
+            return;
+          }
+
+          descBox.classList.add("show");
+          descBtn.textContent = "Скрыть комплектацию";
         });
 
         pickBtn.addEventListener("click", (e) => {
@@ -1745,10 +1852,13 @@ SD карточка 32\\64гб (опционально)
       syncDateConstraints();
       updateDateDisplays();
       clearFieldErrors();
+      successEmailEl.textContent = "—";
+      lastBookedEmail = "";
       setStatus("info", "Сначала выберите даты и время, затем нажмите «Показать доступные комплекты».");
     }
 
     function showSuccessScreen(){
+      successEmailEl.textContent = lastBookedEmail || "—";
       bookingApp.style.display = "none";
       successScreen.classList.add("show");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1794,6 +1904,10 @@ SD карточка 32\\64гб (опционально)
         return;
       }
 
+      if (!validateWorkingRules()) {
+        return;
+      }
+
       if (!isPeriodValid()) {
         showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
         showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
@@ -1823,7 +1937,7 @@ SD карточка 32\\64гб (опционально)
         renderKits(result.kits || []);
 
         if ((result.kits || []).length) {
-          setStatus("success", "Комплекты загружены. Комплектация раскрывается мгновенно.");
+          setStatus("success", "Комплекты загружены. Можно посмотреть комплектацию и выбрать ТЖК.");
         } else {
           setStatus("info", "На выбранный период свободных комплектов нет.");
         }
@@ -1860,6 +1974,7 @@ SD карточка 32\\64гб (опционально)
         const result = await apiCreateBooking(payload);
 
         if (result.status === "success") {
+          lastBookedEmail = payload.email;
           showSuccessScreen();
           return;
         }
@@ -1921,6 +2036,7 @@ SD карточка 32\\64гб (опционально)
     (async function init(){
       setTodayMin();
       applyDefaultTimes();
+      applyTimeConstraints();
       syncDateConstraints();
       updateDateDisplays();
       hideKitsSection();
