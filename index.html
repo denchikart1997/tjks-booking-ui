@@ -1775,16 +1775,10 @@ SD карточка 32\\64гб (опционально)
           e.preventDefault();
 
           const opened = descBox.classList.contains("show");
-          const isSelectedCard = selectedKit === kitName;
 
           if (opened) {
             descBox.classList.remove("show");
             descBtn.textContent = "Посмотреть комплектацию";
-            return;
-          }
-
-          if (selectedKit && !isSelectedCard) {
-            closeAllDescriptionsExcept(selectedKit);
             return;
           }
 
