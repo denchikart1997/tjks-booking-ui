@@ -1373,10 +1373,10 @@ SD карточка 32\\64гб (опционально)
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
-   function validatePhone(value){
-  const digits = value.replace(/\D/g,"");
-  return digits.length === 11 && digits.startsWith("7");
-}
+    function validatePhone(value){
+    const digits = value.replace(/\D/g,"");
+    return digits.length === 11;
+    }
 
     function validateBookingFields(){
       clearFieldErrors();
