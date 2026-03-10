@@ -297,6 +297,7 @@
       -webkit-appearance:none;
       appearance:none;
       outline:none;
+      z-index:2;
     }
 
     .inputIconWrap{
@@ -330,7 +331,7 @@
     }
 
     .selectWrap::after{
-      background-image:url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\");
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
     }
 
     .input[type="time"]::-webkit-calendar-picker-indicator{
@@ -1361,9 +1362,7 @@ SD карточка 32\\64гб (опционально)
       if (!item) return;
 
       const target = item.wrapper || item.input || item.visual;
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
 
       setTimeout(() => {
         if (item.input) item.input.focus({ preventScroll: true });
@@ -1486,6 +1485,14 @@ SD карточка 32\\64гб (опционально)
         btn.disabled = false;
       });
 
+      document.querySelectorAll(".kitDesc").forEach(desc => {
+        desc.classList.remove("show");
+      });
+
+      document.querySelectorAll(".js-desc-btn").forEach(btn => {
+        btn.textContent = "Посмотреть комплектацию";
+      });
+
       hideExtrasSection();
     }
 
@@ -1510,8 +1517,8 @@ SD карточка 32\\64гб (опционально)
 
     function formatPhoneInput(value){
       const digits = value.replace(/\D/g, "");
-
       let normalized = digits;
+
       if (normalized.startsWith("8")) normalized = "7" + normalized.slice(1);
       if (!normalized.startsWith("7")) normalized = "7" + normalized;
       normalized = normalized.slice(0, 11);
@@ -1592,16 +1599,17 @@ SD карточка 32\\64гб (опционально)
 
     async function apiCreateBooking(payload){
       const url = new URL(API_URL);
+
       url.searchParams.set("action", "createBooking");
-      url.searchParams.set("fio", payload.fio);
-      url.searchParams.set("email", payload.email);
-      url.searchParams.set("phone", payload.phone);
-      url.searchParams.set("event", payload.event);
-      url.searchParams.set("start", payload.start);
-      url.searchParams.set("end", payload.end);
-      url.searchParams.set("kit", payload.kit);
-      url.searchParams.set("need_boom", payload.need_boom);
-      url.searchParams.set("comment", payload.comment);
+      url.searchParams.set("fio", encodeURIComponent(payload.fio));
+      url.searchParams.set("email", encodeURIComponent(payload.email));
+      url.searchParams.set("phone", encodeURIComponent(payload.phone));
+      url.searchParams.set("event", encodeURIComponent(payload.event));
+      url.searchParams.set("start", encodeURIComponent(payload.start));
+      url.searchParams.set("end", encodeURIComponent(payload.end));
+      url.searchParams.set("kit", encodeURIComponent(payload.kit));
+      url.searchParams.set("need_boom", encodeURIComponent(payload.need_boom));
+      url.searchParams.set("comment", encodeURIComponent(payload.comment));
 
       const res = await fetch(url.toString(), { method: "GET" });
       if (!res.ok) throw new Error("Ошибка сети при создании брони");
@@ -1619,6 +1627,14 @@ SD карточка 32\\64гб (опционально)
         btn.disabled = false;
       });
 
+      document.querySelectorAll(".kitDesc").forEach(desc => {
+        desc.classList.remove("show");
+      });
+
+      document.querySelectorAll(".js-desc-btn").forEach(btn => {
+        btn.textContent = "Посмотреть комплектацию";
+      });
+
       if (isSame) {
         selectedKit = "";
         selectedKitName.textContent = "—";
@@ -1631,6 +1647,12 @@ SD карточка 32\\64гб (опционально)
       card.classList.add("selected");
       pickBtn.classList.add("selectedBtn");
       pickBtn.textContent = "Комплект выбран";
+
+      const currentDesc = card.querySelector(".kitDesc");
+      const currentDescBtn = card.querySelector(".js-desc-btn");
+
+      if (currentDesc) currentDesc.classList.add("show");
+      if (currentDescBtn) currentDescBtn.textContent = "Скрыть комплектацию";
 
       showExtrasSection();
       btnBook.disabled = false;
@@ -1675,9 +1697,18 @@ SD карточка 32\\64гб (опционально)
 
         descBtn.addEventListener("click", (e) => {
           e.preventDefault();
+
           const opened = descBox.classList.contains("show");
-          descBox.classList.toggle("show");
-          descBtn.textContent = opened ? "Посмотреть комплектацию" : "Скрыть комплектацию";
+
+          if (!opened) {
+            document.querySelectorAll(".kitDesc").forEach(desc => desc.classList.remove("show"));
+            document.querySelectorAll(".js-desc-btn").forEach(btn => btn.textContent = "Посмотреть комплектацию");
+            descBox.classList.add("show");
+            descBtn.textContent = "Скрыть комплектацию";
+          } else {
+            descBox.classList.remove("show");
+            descBtn.textContent = "Посмотреть комплектацию";
+          }
         });
 
         pickBtn.addEventListener("click", (e) => {
