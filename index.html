@@ -1674,6 +1674,45 @@ SD карточка 32\\64гб (опционально)
       return html || `<div class="kitDescTitle">Комплектация</div><div class="kitDescSection"><div class="kitDescItem">Данные отсутствуют.</div></div>`;
     }
 
+    function launchSuccessConfetti(){
+      if (typeof confetti !== "function") return;
+
+      const duration = 900;
+      const end = Date.now() + duration;
+      const colors = ["#3b82f6", "#22c55e", "#ffffff"];
+
+      (function frame(){
+        confetti({
+          particleCount: 6,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.2 },
+          colors: colors
+        });
+
+        confetti({
+          particleCount: 6,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.2 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+
+      confetti({
+        particleCount: 80,
+        spread: 90,
+        startVelocity: 35,
+        gravity: 0.9,
+        origin: { x: 0.5, y: 0.15 },
+        colors: colors
+      });
+    }
+
     async function apiGetKits(start, end){
       const url = new URL(API_URL);
       url.searchParams.set("action", "getKits");
@@ -1829,6 +1868,10 @@ SD карточка 32\\64гб (опционально)
       bookingApp.style.display = "none";
       successScreen.classList.add("show");
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      setTimeout(() => {
+        launchSuccessConfetti();
+      }, 200);
     }
 
     function showBookingScreen(){
@@ -2028,5 +2071,7 @@ SD карточка 32\\64гб (опционально)
       }
     })();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </body>
 </html>
