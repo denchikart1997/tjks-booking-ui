@@ -256,6 +256,7 @@
       position:relative;
       cursor:pointer;
       transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+      overflow:hidden;
     }
 
     .fakeDateBox::after{
@@ -278,6 +279,8 @@
       pointer-events:none;
       color:var(--muted2);
       user-select:none;
+      position:relative;
+      z-index:1;
     }
 
     .fakeDateValue.filled{
@@ -289,7 +292,7 @@
       inset:0;
       width:100%;
       height:100%;
-      opacity:0;
+      opacity:.0001;
       cursor:pointer;
       border:none;
       background:transparent;
@@ -297,7 +300,16 @@
       -webkit-appearance:none;
       appearance:none;
       outline:none;
-      z-index:2;
+      z-index:3;
+    }
+
+    .realDateInput::-webkit-calendar-picker-indicator{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      opacity:0;
+      cursor:pointer;
     }
 
     .inputIconWrap{
@@ -806,7 +818,7 @@
                   <div class="field" id="startDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
-                      <div class="fakeDateBox" id="startDateBox" tabindex="0">
+                      <div class="fakeDateBox" id="startDateBox">
                         <span class="fakeDateValue" id="startDateDisplay">дд.мм.гг</span>
                         <input class="realDateInput" id="startDate" type="date">
                       </div>
@@ -833,7 +845,7 @@
                   <div class="field" id="endDateField">
                     <div class="label">Дата</div>
                     <div class="fakeDateWrap">
-                      <div class="fakeDateBox" id="endDateBox" tabindex="0">
+                      <div class="fakeDateBox" id="endDateBox">
                         <span class="fakeDateValue" id="endDateDisplay">дд.мм.гг</span>
                         <input class="realDateInput" id="endDate" type="date">
                       </div>
@@ -1294,40 +1306,11 @@ SD карточка 32\\64гб (опционально)
       endDateDisplay.classList.toggle("filled", !!endDateEl.value);
     }
 
-    function openDatePicker(input){
-      if (!input) return;
-
-      input.focus({ preventScroll: true });
-
-      try {
-        if (typeof input.showPicker === "function") {
-          input.showPicker();
-          return;
-        }
-      } catch (e) {}
-
-      try {
-        input.click();
-      } catch (e) {}
-    }
-
     function attachFakeDateFocus(input, box){
       input.addEventListener("focus", () => box.classList.add("focused"));
       input.addEventListener("blur", () => box.classList.remove("focused"));
       input.addEventListener("change", updateDateDisplays);
       input.addEventListener("input", updateDateDisplays);
-
-      box.addEventListener("click", (e) => {
-        if (e.target === input) return;
-        openDatePicker(input);
-      });
-
-      box.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openDatePicker(input);
-        }
-      });
     }
 
     function attachWrapFocus(input, wrap){
@@ -1746,16 +1729,6 @@ SD карточка 32\\64гб (опционально)
       pickBtn.textContent = "Комплект выбран";
 
       closeAllDescriptionsExcept(kitName);
-
-      const currentDesc = card.querySelector(".kitDesc");
-      const currentDescBtn = card.querySelector(".js-desc-btn");
-
-      if (currentDesc && !currentDesc.classList.contains("show")) {
-        currentDesc.classList.add("show");
-      }
-      if (currentDescBtn && currentDesc && currentDesc.classList.contains("show")) {
-        currentDescBtn.textContent = "Скрыть комплектацию";
-      }
 
       showExtrasSection();
       btnBook.disabled = false;
