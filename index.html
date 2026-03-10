@@ -1843,7 +1843,7 @@ SD карточка 32\\64гб (опционально)
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
-        phone: phoneEl.value.trim(),
+        phone: phoneEl.value.replace(/\D/g,""),
         event: eventEl.value.trim(),
         start: formatApiDate(startDateEl.value, startTimeEl.value),
         end: formatApiDate(endDateEl.value, endTimeEl.value),
