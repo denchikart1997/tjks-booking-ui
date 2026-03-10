@@ -784,7 +784,7 @@
             <div class="field" id="phoneField">
               <div class="label">Телефон</div>
               <input class="input" id="phone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel">
-              <div class="fieldError" id="phoneError">Введите телефон в формате +7 900 000-00-00.</div>
+              <div class="fieldError" id="phoneError">Введите телефон полностью.</div>
             </div>
 
             <div class="field" id="eventField">
@@ -1374,8 +1374,8 @@ SD карточка 32\\64гб (опционально)
     }
 
     function validatePhone(value){
-    const digits = value.replace(/\D/g,"");
-    return digits.length === 11;
+      const digits = value.replace(/\D/g, "");
+      return digits.length === 11;
     }
 
     function validateBookingFields(){
@@ -1415,9 +1415,9 @@ SD карточка 32\\64гб (опционально)
       }
 
       if (!validatePhone(phone)) {
-        showFieldError("phone", "Введите телефон в формате +7 900 000-00-00.");
+        showFieldError("phone", "Введите телефон полностью.");
         focusField("phone");
-        setStatus("error", "Введите телефон в формате +7 900 000-00-00.");
+        setStatus("error", "Введите телефон полностью.");
         return false;
       }
 
@@ -1602,15 +1602,15 @@ SD карточка 32\\64гб (опционально)
       const url = new URL(API_URL);
 
       url.searchParams.set("action", "createBooking");
-      url.searchParams.set("fio", encodeURIComponent(payload.fio));
-      url.searchParams.set("email", encodeURIComponent(payload.email));
-      url.searchParams.set("phone", encodeURIComponent(payload.phone));
-      url.searchParams.set("event", encodeURIComponent(payload.event));
-      url.searchParams.set("start", encodeURIComponent(payload.start));
-      url.searchParams.set("end", encodeURIComponent(payload.end));
-      url.searchParams.set("kit", encodeURIComponent(payload.kit));
-      url.searchParams.set("need_boom", encodeURIComponent(payload.need_boom));
-      url.searchParams.set("comment", encodeURIComponent(payload.comment));
+      url.searchParams.set("fio", payload.fio);
+      url.searchParams.set("email", payload.email);
+      url.searchParams.set("phone", payload.phone);
+      url.searchParams.set("event", payload.event);
+      url.searchParams.set("start", payload.start);
+      url.searchParams.set("end", payload.end);
+      url.searchParams.set("kit", payload.kit);
+      url.searchParams.set("need_boom", payload.need_boom);
+      url.searchParams.set("comment", payload.comment);
 
       const res = await fetch(url.toString(), { method: "GET" });
       if (!res.ok) throw new Error("Ошибка сети при создании брони");
@@ -1843,7 +1843,7 @@ SD карточка 32\\64гб (опционально)
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
-        phone: phoneEl.value.replace(/\D/g,""),
+        phone: phoneEl.value.replace(/\D/g, ""),
         event: eventEl.value.trim(),
         start: formatApiDate(startDateEl.value, startTimeEl.value),
         end: formatApiDate(endDateEl.value, endTimeEl.value),
