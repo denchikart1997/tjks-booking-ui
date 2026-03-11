@@ -919,6 +919,17 @@
           <span class="apiDot" id="apiDot"></span>
           <span id="apiText">Проверка подключения…</span>
         </span>
+
+        <div id="retryApiWrap" style="margin-top:10px; display:none;">
+          <button
+            class="btnSmall"
+            id="btnRetryApi"
+            type="button"
+            style="max-width:220px; margin:0 auto; display:block;"
+          >
+            Повторить подключение
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1245,6 +1256,7 @@ SD карточка 32\\64гб (опционально)
     const btnLoad = document.getElementById("btnLoad");
     const btnBook = document.getElementById("btnBook");
     const btnBackToForm = document.getElementById("btnBackToForm");
+    const btnRetryApi = document.getElementById("btnRetryApi");
 
     const statusBox = document.getElementById("statusBox");
     const kitsList = document.getElementById("kitsList");
@@ -1253,6 +1265,7 @@ SD карточка 32\\64гб (опционально)
     const apiDot = document.getElementById("apiDot");
     const apiText = document.getElementById("apiText");
     const successEmailEl = document.getElementById("successEmail");
+    const retryApiWrap = document.getElementById("retryApiWrap");
 
     const fieldMap = {
       fio: { input: fioEl, error: document.getElementById("fioError"), wrapper: document.getElementById("fioField") },
@@ -1713,6 +1726,44 @@ SD карточка 32\\64гб (опционально)
       });
     }
 
+    async function checkApiConnection(showStatusMessage = false){
+      try {
+        retryApiWrap.style.display = "none";
+        btnRetryApi.disabled = true;
+        btnRetryApi.classList.add("loading");
+
+        const url = new URL(API_URL);
+        url.searchParams.set("action", "ping");
+
+        const res = await fetch(url.toString(), { cache: "no-store" });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error("Ping error");
+
+        apiText.textContent = "API подключён";
+        apiDot.classList.remove("error");
+
+        if (showStatusMessage) {
+          setStatus("success", "Подключение к API восстановлено.");
+        }
+
+        return true;
+      } catch (e) {
+        apiText.textContent = "Ошибка подключения API";
+        apiDot.classList.add("error");
+        retryApiWrap.style.display = "block";
+
+        if (showStatusMessage) {
+          setStatus("error", "Не удалось подключиться к Apps Script API.");
+        }
+
+        return false;
+      } finally {
+        btnRetryApi.disabled = false;
+        btnRetryApi.classList.remove("loading");
+      }
+    }
+
     async function apiGetKits(start, end){
       const url = new URL(API_URL);
       url.searchParams.set("action", "getKits");
@@ -1918,6 +1969,12 @@ SD карточка 32\\64гб (опционально)
         return;
       }
 
+      const apiOk = await checkApiConnection(false);
+      if (!apiOk) {
+        setStatus("error", "API недоступен. Попробуйте повторить подключение.");
+        return;
+      }
+
       if (!isPeriodValid()) {
         showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
         showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
@@ -1964,6 +2021,12 @@ SD карточка 32\\64гб (опционально)
     btnBook.addEventListener("click", async () => {
       if (!validateBookingFields()) return;
 
+      const apiOk = await checkApiConnection(false);
+      if (!apiOk) {
+        setStatus("error", "API недоступен. Попробуйте повторить подключение.");
+        return;
+      }
+
       const payload = {
         fio: fioEl.value.trim(),
         email: emailEl.value.trim(),
@@ -2007,6 +2070,10 @@ SD карточка 32\\64гб (опционально)
     });
 
     btnBackToForm.addEventListener("click", showBookingScreen);
+
+    btnRetryApi.addEventListener("click", async () => {
+      await checkApiConnection(true);
+    });
 
     [fioEl, emailEl, eventEl, startDateEl, startTimeEl, endDateEl, endTimeEl].forEach((el) => {
       el.addEventListener("input", clearFieldErrors);
@@ -2053,22 +2120,7 @@ SD карточка 32\\64гб (опционально)
       hideExtrasSection();
       clearFieldErrors();
 
-      try {
-        const url = new URL(API_URL);
-        url.searchParams.set("action", "ping");
-
-        const res = await fetch(url.toString());
-        const data = await res.json();
-
-        if (!data.ok) throw new Error("Ping error");
-
-        apiText.textContent = "API подключён";
-        apiDot.classList.remove("error");
-      } catch (e) {
-        apiText.textContent = "Ошибка подключения API";
-        apiDot.classList.add("error");
-        setStatus("error", "Не удалось подключиться к Apps Script API.");
-      }
+      await checkApiConnection(true);
     })();
   </script>
 
