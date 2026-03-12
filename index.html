@@ -39,6 +39,7 @@
       color:var(--text);
       overscroll-behavior-y:none;
       scroll-behavior:smooth;
+      background-color:#030914;
     }
 
     body{
@@ -144,6 +145,8 @@
         border-color .22s cubic-bezier(.22,1,.36,1),
         background .22s cubic-bezier(.22,1,.36,1),
         box-shadow .22s cubic-bezier(.22,1,.36,1);
+      transform:translateZ(0);
+      backface-visibility:hidden;
     }
 
     .cardInner{
@@ -703,28 +706,31 @@
     .successScreen{
       display:none;
       opacity:0;
-      transform:translateY(8px);
     }
 
     .successScreen.show{
       display:block;
-      animation:successScreenIn .28s ease forwards;
+      animation:successScreenFade .22s ease forwards;
     }
 
-    @keyframes successScreenIn{
+    @keyframes successScreenFade{
       from{
         opacity:0;
-        transform:translateY(8px);
       }
       to{
         opacity:1;
-        transform:translateY(0);
       }
+    }
+
+    .successScreen .card{
+      transform:none;
     }
 
     .successBox{
       text-align:center;
       padding:28px 20px;
+      position:relative;
+      isolation:isolate;
     }
 
     .successIcon{
@@ -2028,18 +2034,24 @@ SD карточка 32\\64гб (опционально)
       successEmailEl.textContent = lastBookedEmail || "—";
       bookingApp.style.display = "none";
       successScreen.classList.add("show");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo(0, 0);
 
       setTimeout(() => {
         launchSuccessConfetti();
-      }, 200);
+      }, 180);
     }
 
     function showBookingScreen(){
       successScreen.classList.remove("show");
-      bookingApp.style.display = "";
+      successScreen.style.display = "none";
+
       clearAfterSuccess();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      requestAnimationFrame(() => {
+        successScreen.style.display = "";
+        bookingApp.style.display = "";
+        window.scrollTo(0, 0);
+      });
     }
 
     btnLoad.addEventListener("click", async () => {
@@ -2079,12 +2091,6 @@ SD карточка 32\\64гб (опционально)
         return;
       }
 
-      const apiOk = await checkApiConnection(false);
-      if (!apiOk) {
-        setStatus("error", "API недоступен. Попробуйте повторить подключение.");
-        return;
-      }
-
       if (!isPeriodValid()) {
         showFieldError("endDate", "Дата и время возврата должны быть позже даты и времени выдачи.");
         showFieldError("endTime", "Дата и время возврата должны быть позже даты и времени выдачи.");
@@ -2096,10 +2102,16 @@ SD карточка 32\\64гб (опционально)
       const start = formatApiDate(startDateEl.value, startTimeEl.value);
       const end = formatApiDate(endDateEl.value, endTimeEl.value);
 
+      btnLoad.disabled = true;
+      btnLoad.classList.add("loading");
+      setStatus("info", "Проверяем подключение и загружаем комплекты...");
+
       try {
-        btnLoad.disabled = true;
-        btnLoad.classList.add("loading");
-        setStatus("info", "Загружаем доступные комплекты...");
+        const apiOk = await checkApiConnection(false);
+        if (!apiOk) {
+          setStatus("error", "API недоступен. Попробуйте повторить подключение.");
+          return;
+        }
 
         const result = await apiGetKits(start, end);
 
@@ -2131,11 +2143,9 @@ SD карточка 32\\64гб (опционально)
     btnBook.addEventListener("click", async () => {
       if (!validateBookingFields()) return;
 
-      const apiOk = await checkApiConnection(false);
-      if (!apiOk) {
-        setStatus("error", "API недоступен. Попробуйте повторить подключение.");
-        return;
-      }
+      btnBook.disabled = true;
+      btnBook.classList.add("loading");
+      setStatus("info", "Проверяем подключение и создаём бронь...");
 
       const payload = {
         fio: fioEl.value.trim(),
@@ -2150,9 +2160,11 @@ SD карточка 32\\64гб (опционально)
       };
 
       try {
-        btnBook.disabled = true;
-        btnBook.classList.add("loading");
-        setStatus("info", "Создаём бронь...");
+        const apiOk = await checkApiConnection(false);
+        if (!apiOk) {
+          setStatus("error", "API недоступен. Попробуйте повторить подключение.");
+          return;
+        }
 
         const result = await apiCreateBooking(payload);
 
@@ -2164,8 +2176,6 @@ SD карточка 32\\64гб (опционально)
 
         if (result.status === "occupied") {
           setStatus("error", "Пока вы оформляли заявку, комплект уже заняли. Обновите список.");
-          btnBook.disabled = false;
-          btnBook.classList.remove("loading");
           return;
         }
 
