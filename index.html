@@ -98,6 +98,11 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      transition:
+        transform .22s cubic-bezier(.22,1,.36,1),
+        border-color .22s cubic-bezier(.22,1,.36,1),
+        background .22s cubic-bezier(.22,1,.36,1),
+        box-shadow .22s cubic-bezier(.22,1,.36,1);
     }
 
     .logoWide img{
@@ -134,6 +139,11 @@
       -webkit-backdrop-filter:blur(16px);
       overflow:hidden;
       margin-bottom:16px;
+      transition:
+        transform .22s cubic-bezier(.22,1,.36,1),
+        border-color .22s cubic-bezier(.22,1,.36,1),
+        background .22s cubic-bezier(.22,1,.36,1),
+        box-shadow .22s cubic-bezier(.22,1,.36,1);
     }
 
     .cardInner{
@@ -180,7 +190,12 @@
       background:rgba(255,255,255,.05);
       color:var(--text);
       outline:none;
-      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease), opacity .18s var(--ease);
+      transition:
+        border-color .22s cubic-bezier(.22,1,.36,1),
+        background .22s cubic-bezier(.22,1,.36,1),
+        box-shadow .22s cubic-bezier(.22,1,.36,1),
+        opacity .18s cubic-bezier(.22,1,.36,1),
+        transform .18s cubic-bezier(.22,1,.36,1);
       font:inherit;
       appearance:none;
       -webkit-appearance:none;
@@ -233,6 +248,11 @@
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
       padding:14px;
+      transition:
+        transform .22s cubic-bezier(.22,1,.36,1),
+        border-color .22s cubic-bezier(.22,1,.36,1),
+        background .22s cubic-bezier(.22,1,.36,1),
+        box-shadow .22s cubic-bezier(.22,1,.36,1);
     }
 
     .timeCardTitle{
@@ -271,7 +291,7 @@
       align-items:center;
       position:relative;
       cursor:pointer;
-      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+      transition:border-color .22s cubic-bezier(.22,1,.36,1), background .22s cubic-bezier(.22,1,.36,1), box-shadow .22s cubic-bezier(.22,1,.36,1), transform .18s cubic-bezier(.22,1,.36,1);
       overflow:hidden;
     }
 
@@ -331,7 +351,7 @@
     .inputIconWrap{
       position:relative;
       border-radius:16px;
-      transition:border-color .18s var(--ease), background .18s var(--ease), box-shadow .18s var(--ease);
+      transition:border-color .22s cubic-bezier(.22,1,.36,1), background .22s cubic-bezier(.22,1,.36,1), box-shadow .22s cubic-bezier(.22,1,.36,1), transform .18s cubic-bezier(.22,1,.36,1);
     }
 
     .inputIconWrap .input,
@@ -397,7 +417,13 @@
       font-weight:800;
       color:#fff;
       cursor:pointer;
-      transition:transform .15s var(--ease), opacity .15s var(--ease), filter .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
+      transition:
+        transform .16s cubic-bezier(.22,1,.36,1),
+        opacity .16s cubic-bezier(.22,1,.36,1),
+        filter .2s cubic-bezier(.22,1,.36,1),
+        background .2s cubic-bezier(.22,1,.36,1),
+        border-color .2s cubic-bezier(.22,1,.36,1),
+        box-shadow .2s cubic-bezier(.22,1,.36,1);
       font:inherit;
       user-select:none;
       -webkit-user-select:none;
@@ -405,30 +431,6 @@
       touch-action:manipulation;
       box-shadow:none;
       position:relative;
-    }
-
-    .btn:hover{ transform:translateY(-1px); }
-    .btn:active{ transform:translateY(0); }
-
-    .btn:focus,
-    .btn:focus-visible,
-    .btnSmall:focus,
-    .btnSmall:focus-visible{
-      outline:none;
-      box-shadow:none;
-    }
-
-    .btn[disabled]{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-      filter:none;
-    }
-
-    .btnPrimary{
-      width:100%;
-      background:linear-gradient(90deg, var(--brand2), var(--brand));
-      box-shadow:0 12px 28px rgba(59,130,246,.18);
     }
 
     .btnSmall{
@@ -450,6 +452,38 @@
       -webkit-appearance:none;
       -moz-appearance:none;
       position:relative;
+      transition:
+        transform .16s cubic-bezier(.22,1,.36,1),
+        opacity .16s cubic-bezier(.22,1,.36,1),
+        filter .2s cubic-bezier(.22,1,.36,1),
+        background .2s cubic-bezier(.22,1,.36,1),
+        border-color .2s cubic-bezier(.22,1,.36,1),
+        box-shadow .2s cubic-bezier(.22,1,.36,1);
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn:active,
+    .btnSmall:active{ transform:translateY(0); }
+
+    .btn:focus,
+    .btn:focus-visible,
+    .btnSmall:focus,
+    .btnSmall:focus-visible{
+      outline:none;
+      box-shadow:none;
+    }
+
+    .btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      filter:none;
+    }
+
+    .btnPrimary{
+      width:100%;
+      background:linear-gradient(90deg, var(--brand2), var(--brand));
+      box-shadow:0 12px 28px rgba(59,130,246,.18);
     }
 
     .btnSmall.selectedBtn{
@@ -491,6 +525,7 @@
       font-size:14px;
       line-height:1.45;
       border:1px solid transparent;
+      transition:opacity .22s ease, transform .22s ease;
     }
 
     .status.show{ display:block; }
@@ -532,7 +567,6 @@
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
       padding:16px;
-      transition:border-color .18s var(--ease), background .18s var(--ease);
     }
 
     .kit.selected{
@@ -558,15 +592,27 @@
       font-size:13px;
       color:rgba(255,255,255,.9);
       line-height:1.55;
-      display:none;
-      padding:12px;
+      padding:0 12px;
       border-radius:14px;
       background:rgba(0,0,0,.18);
       border:1px solid rgba(255,255,255,.06);
+      opacity:0;
+      max-height:0;
+      overflow:hidden;
+      transform:translateY(-6px);
+      transition:
+        opacity .24s ease,
+        max-height .3s ease,
+        transform .24s ease,
+        padding .24s ease,
+        margin-top .24s ease;
     }
 
     .kitDesc.show{
-      display:block;
+      opacity:1;
+      max-height:1200px;
+      transform:translateY(0);
+      padding:12px;
     }
 
     .kitDescTitle{
@@ -631,7 +677,7 @@
 
     .kitsSectionCard.show{
       display:block;
-      animation:fadeInSection .22s ease;
+      animation:fadeInSection .28s cubic-bezier(.22,1,.36,1);
     }
 
     .extrasSectionCard{
@@ -640,10 +686,32 @@
 
     .extrasSectionCard.show{
       display:block;
-      animation:fadeInSection .22s ease;
+      animation:fadeInSection .28s cubic-bezier(.22,1,.36,1);
     }
 
     @keyframes fadeInSection{
+      from{
+        opacity:0;
+        transform:translateY(10px) scale(.995);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+      }
+    }
+
+    .successScreen{
+      display:none;
+      opacity:0;
+      transform:translateY(8px);
+    }
+
+    .successScreen.show{
+      display:block;
+      animation:successScreenIn .28s ease forwards;
+    }
+
+    @keyframes successScreenIn{
       from{
         opacity:0;
         transform:translateY(8px);
@@ -652,14 +720,6 @@
         opacity:1;
         transform:translateY(0);
       }
-    }
-
-    .successScreen{
-      display:none;
-    }
-
-    .successScreen.show{
-      display:block;
     }
 
     .successBox{
@@ -733,6 +793,19 @@
       box-shadow:0 0 12px rgba(239,68,68,.5);
     }
 
+    @media (hover:hover){
+      .kit:hover,
+      .timeCard:hover,
+      .logoWide:hover{
+        transform:translateY(-1px);
+      }
+
+      .btn:hover,
+      .btnSmall:hover{
+        filter:brightness(1.05);
+      }
+    }
+
     @media (max-width:640px){
       body{
         padding:12px 10px 20px;
@@ -787,10 +860,6 @@
         font-size:16px;
       }
 
-      .kitDesc{
-        padding:14px;
-      }
-
       .kitDescItem{
         margin:6px 0;
       }
@@ -798,6 +867,16 @@
       .btn,
       .btnSmall{
         -webkit-tap-highlight-color:transparent;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,
+      *::before,
+      *::after{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
       }
     }
   </style>
@@ -815,7 +894,7 @@
 
       <section class="card">
         <div class="cardInner">
-          <h2 class="cardTitle">ОФОРМЛЕНИЕ ТЖК</h2>
+          <h2 class="cardTitle">Оформление ТЖК</h2>
 
           <div class="grid">
             <div class="field" id="fioField">
