@@ -103,6 +103,28 @@
       user-select:none;
     }
 
+    .logoWide{
+      width:min(100%,560px);
+      margin:0 auto 16px;
+      padding:16px 18px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logoWide img{
+      display:block;
+      width:100%;
+      height:auto;
+      max-width:500px;
+      object-fit:contain;
+      filter:drop-shadow(0 4px 20px rgba(255,255,255,.05));
+    }
+
     .hero h1{
       margin:0;
       font-size:clamp(28px,5vw,46px);
@@ -729,6 +751,17 @@
         font-size:20px;
       }
 
+      .logoWide{
+        width:100%;
+        padding:12px 14px;
+        border-radius:18px;
+        margin-bottom:14px;
+      }
+
+      .logoWide img{
+        max-width:100%;
+      }
+
       .hero h1{
         font-size:34px;
       }
@@ -778,7 +811,9 @@
 
     <div id="bookingApp">
       <div class="hero">
-        <div class="logo">ТЖК</div>
+        <div class="logoWide">
+          <img src="ipam-logo.png" alt="Первая Академия Медиа">
+        </div>
         <h1>Лист бронирования</h1>
       </div>
 
